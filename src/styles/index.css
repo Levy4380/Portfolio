@@ -1,0 +1,162 @@
+@import 'tailwindcss';
+
+@theme {
+  /* fonts */
+  --font-sans: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-display: Fraunces, ui-serif, Georgia, serif;
+
+  /* raw palette (§2.1) */
+  --color-ink-950: #14110e;
+  --color-ink-900: #1c1915;
+  --color-ink-800: #2a251f;
+  --color-ink-700: #3a342c;
+  --color-ink-600: #4f493f;
+  --color-ink-500: #6b6357;
+  --color-ink-400: #8a8174;
+  --color-ink-300: #b5ab9c;
+  --color-paper-50: #fbf8f2;
+  --color-paper-100: #f3efe7;
+  --color-paper-200: #e6dfd2;
+  --color-paper-300: #ddd4c4;
+  --color-paper-400: #c9bea9;
+  --color-rust-300: #e3a07c;
+  --color-rust-500: #b4532a;
+  --color-rust-600: #8d3d1b;
+  --color-rust-700: #6e2f14;
+  --color-moss-600: #4d7c4f;
+  --color-amber-600: #b7791f;
+  --color-danger-600: #b42318;
+
+  /* semantic colors (§2.2) */
+  --color-desktop: var(--color-ink-950);
+  --color-window: var(--color-paper-50);
+  --color-sunken: var(--color-paper-100);
+  --color-titlebar: var(--color-paper-200);
+  --color-titlebar-inactive: var(--color-paper-100);
+  --color-edge: rgb(28 25 21 / 0.14);
+  --color-line: var(--color-paper-300);
+  --color-edge-dark: var(--color-ink-700);
+  --color-indicator: var(--color-ink-300);
+  --color-indicator-muted: var(--color-ink-400);
+  --color-fg: var(--color-ink-900);
+  --color-fg-muted: var(--color-ink-600);
+  --color-fg-subtle: var(--color-ink-500);
+  --color-fg-inverse: var(--color-paper-50);
+  --color-fg-inverse-muted: var(--color-ink-300);
+  --color-accent: var(--color-rust-600);
+  --color-accent-strong: var(--color-rust-700);
+  --color-accent-on-dark: var(--color-rust-300);
+  --color-focus: var(--color-rust-600);
+  --color-selection: rgb(141 61 27 / 0.12);
+  --color-selection-desktop: rgb(141 61 27 / 0.85);
+  --color-taskbar: rgb(28 25 21 / 0.82);
+  --color-chrome-hover: rgb(28 25 21 / 0.08);
+  --color-chrome-press: rgb(28 25 21 / 0.14);
+  --color-glass-hover: rgb(251 248 242 / 0.1);
+  --color-glass-active: rgb(251 248 242 / 0.16);
+  --color-danger: var(--color-danger-600);
+  --color-folder-about: var(--color-moss-600);
+  --color-folder-projects: var(--color-rust-500);
+  --color-folder-experiments: var(--color-amber-600);
+
+  /* type scale (§2.4) */
+  --text-meta: 0.75rem;
+  --text-meta--line-height: 1rem;
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.125rem;
+  --text-ui: 0.875rem;
+  --text-ui--line-height: 1.25rem;
+  --text-body: 0.9375rem;
+  --text-body--line-height: 1.5rem;
+  --text-heading: 1.125rem;
+  --text-heading--line-height: 1.625rem;
+  --text-title: 1.5rem;
+  --text-title--line-height: 1.875rem;
+  --text-display: 2rem;
+  --text-display--line-height: 2.375rem;
+
+  --max-width-prose: 65ch;
+
+  /* shape (§2.6) */
+  --radius-window: 10px;
+  --radius-menu: 12px;
+  --radius-control: 6px;
+  --radius-tile: 8px;
+  --radius-chip: 4px;
+
+  /* elevation (§2.7) */
+  --shadow-window: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(20 17 14 / 0.12),
+    0 8px 24px rgb(20 17 14 / 0.28);
+  --shadow-window-active: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(20 17 14 / 0.16),
+    0 18px 48px rgb(20 17 14 / 0.45);
+  --shadow-menu: 0 12px 32px rgb(0 0 0 / 0.45), 0 0 0 1px rgb(251 248 242 / 0.06);
+  --shadow-taskbar: 0 -1px 0 rgb(251 248 242 / 0.06), 0 -8px 24px rgb(0 0 0 / 0.25);
+
+  /* layering (§7.8) */
+  --z-10: 10;
+  --z-1000: 1000;
+  --z-1100: 1100;
+  --z-1200: 1200;
+  --z-1300: 1300;
+
+  /* motion (§10.1, mirrored for CSS) */
+  --duration-instant: 80ms;
+  --duration-fast: 120ms;
+  --duration-120: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 240ms;
+  --ease-os-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-os-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
+:root {
+  --os-taskbar-h: 48px;
+  --os-titlebar-h: 40px;
+}
+
+@custom-variant window-inactive (&:where([data-window]:not([data-active]) *));
+
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+  }
+}
+
+@utility bg-wallpaper {
+  background-color: var(--color-desktop);
+  background-image:
+    radial-gradient(60rem 40rem at 85% 10%, rgb(110 47 20 / 0.28), transparent 70%),
+    radial-gradient(50rem 36rem at 10% 100%, rgb(77 124 79 / 0.12), transparent 70%),
+    radial-gradient(rgb(251 248 242 / 0.06) 1px, transparent 1px);
+  background-size: auto, auto, 24px 24px;
+}
+
+@layer base {
+  [data-surface='dark'] {
+    --color-focus: var(--color-rust-300);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-desktop);
+    color: var(--color-fg-inverse);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background: var(--color-fg);
+    color: var(--color-sunken);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
