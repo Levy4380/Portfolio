@@ -9,6 +9,7 @@ npm install
 npm run dev      # development server
 npm run build    # typecheck and production build in dist/
 npm run preview  # serve the production build locally
+npm start        # serve dist/ on $PORT (Laravel Cloud)
 npm run lint
 npm run format
 ```
@@ -39,6 +40,6 @@ Typical fallbacks:
 
 - **nginx:** `try_files $uri $uri/ /index.html;`
 - **Apache:** `FallbackResource /index.html` inside the site directory.
-- **Laravel Cloud or another static host:** enable the provider’s SPA / single-page fallback so unknown paths return `index.html` with a 200. That setting lives in the host, not in this repository. Do not add a Laravel application just to serve these files.
+- **Laravel Cloud:** this repository is a Node app, not a Laravel app. The build command must be `npm ci --audit false && npm run build`. The start command is `npm start`, which runs `server.js`. That process reads `PORT` and falls back to `index.html` for client routes. Leave the listen address unset so the process binds IPv6; Cloud’s health check uses it.
 
 There is no backend in this project.
