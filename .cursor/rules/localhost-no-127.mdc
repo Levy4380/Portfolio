@@ -1,0 +1,14 @@
+---
+description: Abrir el dev server en localhost, nunca en 127.0.0.1
+alwaysApply: true
+---
+
+# Dev server: localhost
+
+El servidor de Vite de este proyecto está en `http://localhost:5173`.
+
+Al probar en el navegador (browser tools, Playwright, curl, subagentes):
+
+- Navegá a `http://localhost:5173` (o el puerto que imprima Vite, siempre con el host `localhost`).
+- No uses `127.0.0.1`. Esa dirección no responde acá y el navegador se queda trabado.
+- Si la URL impresa usa `127.0.0.1`, reescribila a `localhost` antes de abrirla.

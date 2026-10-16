@@ -1,0 +1,21 @@
+---
+description: Verificar la app en un navegador visible, nunca invisible ni en segundo plano
+alwaysApply: true
+---
+
+# Navegador visible
+
+Al probar la app, el navegador tiene que verse en pantalla. Un navegador invisible o en segundo plano no sirve.
+
+Permitido:
+
+- La pestaña del navegador del editor.
+- Chromium (o Chrome) con ventana visible. Si hace falta Playwright, solo con ventana visible (`headless: false`).
+
+Prohibido:
+
+- Playwright, Puppeteer o Chrome en modo headless.
+- Cualquier browser tool que no muestre una ventana.
+- `--headless`, `--headless=new`, `headless: true`.
+
+Si la única opción corre invisible, no la uses: abrí Chromium con ventana o la pestaña del editor. La URL del dev server sigue siendo `http://localhost:5173`.
