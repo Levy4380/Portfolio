@@ -7,7 +7,6 @@ import robinLampsCover from '../../assets/projects/robin-lamps.png';
 import type { ImageAsset } from '../types.ts';
 import { defineCase, type CaseConfig } from './CaseDocument.tsx';
 
-const tonica = 'https://www.wearetonica.com/casos';
 
 function cover(src: string, width: number, height: number): ImageAsset {
   return { src, alt: '', width, height };
