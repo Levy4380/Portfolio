@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { subscribeAnnouncements } from './announce.ts';
+import { subscribeAnnouncements } from './A11yHelpers/announce.ts';
 
 export function LiveAnnouncer() {
   const [message, setMessage] = useState('');

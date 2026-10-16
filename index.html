@@ -15,6 +15,13 @@
       rel="stylesheet"
     />
     <title>Your Name — Frontend Developer</title>
+    <script>
+      try {
+        if (localStorage.getItem('portfolio-theme') === 'light') {
+          document.documentElement.dataset.theme = 'light';
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

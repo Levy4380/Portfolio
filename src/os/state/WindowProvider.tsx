@@ -6,16 +6,16 @@ import {
   type ReactNode,
 } from 'react';
 
-import { TASKBAR_H } from '../windows/geometry.ts';
-import { selectTaskbarItems } from './selectors.ts';
-import type { Viewport, WindowAction, WindowState } from './types.ts';
+import { TASKBAR_H } from '../windows/WindowsHelpers/geometry.ts';
+import { selectTaskbarItems } from './StateHelpers/selectors.ts';
+import type { Viewport, WindowAction, WindowState } from './StateHelpers/types.ts';
 import {
   WindowDispatchContext,
   WindowStateContext,
   type WindowDispatchApi,
   type WindowStateSnapshot,
-} from './useWindowActions.ts';
-import { initialWindowState, windowReducer } from './windowReducer.ts';
+} from './StateHelpers/useWindowActions.ts';
+import { initialWindowState, windowReducer } from './StateHelpers/windowReducer.ts';
 
 /** Desktop area. geometry.ts has no viewport helper; the taskbar is `TASKBAR_H`. */
 function readViewport(): Viewport {

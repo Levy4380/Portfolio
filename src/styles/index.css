@@ -3,7 +3,8 @@
 @theme {
   /* fonts */
   --font-sans: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-mono:
+    'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --font-display: Fraunces, ui-serif, Georgia, serif;
 
   /* raw palette (§2.1) */
@@ -28,34 +29,44 @@
   --color-amber-600: #b7791f;
   --color-danger-600: #b42318;
 
-  /* semantic colors (§2.2) */
+  /*
+   * Semantic colors — dark theme, the default (§2.2).
+   * `html[data-theme='light']` remaps every token below. Components never
+   * branch on the theme name; they only use these roles.
+   */
   --color-desktop: var(--color-ink-950);
-  --color-window: var(--color-paper-50);
-  --color-sunken: var(--color-paper-100);
-  --color-titlebar: var(--color-paper-200);
-  --color-titlebar-inactive: var(--color-paper-100);
-  --color-edge: rgb(28 25 21 / 0.14);
-  --color-line: var(--color-paper-300);
+  --color-window: var(--color-ink-950);
+  --color-sunken: var(--color-ink-800);
+  --color-titlebar: var(--color-ink-950);
+  --color-titlebar-inactive: var(--color-ink-900);
+  --color-edge: rgb(251 248 242 / 0.16);
+  --color-line: rgb(251 248 242 / 0.1);
   --color-edge-dark: var(--color-ink-700);
   --color-indicator: var(--color-ink-300);
   --color-indicator-muted: var(--color-ink-400);
-  --color-fg: var(--color-ink-900);
-  --color-fg-muted: var(--color-ink-600);
-  --color-fg-subtle: var(--color-ink-500);
+  --color-fg: var(--color-paper-50);
+  --color-fg-muted: var(--color-ink-300);
+  --color-fg-subtle: var(--color-ink-300);
   --color-fg-inverse: var(--color-paper-50);
   --color-fg-inverse-muted: var(--color-ink-300);
-  --color-accent: var(--color-rust-600);
-  --color-accent-strong: var(--color-rust-700);
+  --color-accent: var(--color-rust-300);
+  --color-accent-strong: var(--color-rust-500);
   --color-accent-on-dark: var(--color-rust-300);
-  --color-focus: var(--color-rust-600);
-  --color-selection: rgb(141 61 27 / 0.12);
+  --color-on-accent: var(--color-ink-950);
+  --color-focus: var(--color-rust-300);
+  --color-selection: rgb(251 248 242 / 0.14);
   --color-selection-desktop: rgb(141 61 27 / 0.85);
   --color-taskbar: rgb(28 25 21 / 0.82);
-  --color-chrome-hover: rgb(28 25 21 / 0.08);
-  --color-chrome-press: rgb(28 25 21 / 0.14);
+  --color-chrome-hover: rgb(251 248 242 / 0.08);
+  --color-chrome-press: rgb(251 248 242 / 0.16);
   --color-glass-hover: rgb(251 248 242 / 0.1);
   --color-glass-active: rgb(251 248 242 / 0.16);
   --color-danger: var(--color-danger-600);
+  --color-traffic-close: var(--color-danger-600);
+  --color-traffic-minimize: var(--color-amber-600);
+  --color-traffic-zoom: var(--color-moss-600);
+  --color-traffic-idle: var(--color-ink-700);
+  --color-traffic-glyph: var(--color-ink-950);
   --color-folder-about: var(--color-moss-600);
   --color-folder-projects: var(--color-rust-500);
   --color-folder-experiments: var(--color-amber-600);
@@ -86,12 +97,16 @@
   --radius-chip: 4px;
 
   /* elevation (§2.7) */
-  --shadow-window: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(20 17 14 / 0.12),
+  --shadow-window:
+    inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(20 17 14 / 0.12),
     0 8px 24px rgb(20 17 14 / 0.28);
-  --shadow-window-active: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(20 17 14 / 0.16),
+  --shadow-window-active:
+    inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(20 17 14 / 0.16),
     0 18px 48px rgb(20 17 14 / 0.45);
-  --shadow-menu: 0 12px 32px rgb(0 0 0 / 0.45), 0 0 0 1px rgb(251 248 242 / 0.06);
-  --shadow-taskbar: 0 -1px 0 rgb(251 248 242 / 0.06), 0 -8px 24px rgb(0 0 0 / 0.25);
+  --shadow-menu:
+    0 12px 32px rgb(0 0 0 / 0.45), 0 0 0 1px rgb(251 248 242 / 0.06);
+  --shadow-taskbar:
+    0 -1px 0 rgb(251 248 242 / 0.06), 0 -8px 24px rgb(0 0 0 / 0.25);
 
   /* layering (§7.8) */
   --z-10: 10;
@@ -113,6 +128,54 @@
 :root {
   --os-taskbar-h: 48px;
   --os-titlebar-h: 40px;
+  --wallpaper-glow: rgb(110 47 20 / 0.28);
+  --wallpaper-moss: rgb(77 124 79 / 0.12);
+  --wallpaper-dot: rgb(251 248 242 / 0.06);
+  color-scheme: dark;
+}
+
+/* Light theme. Same roles, paper surfaces, ink type. */
+html[data-theme='light'] {
+  color-scheme: light;
+  --color-desktop: var(--color-paper-200);
+  --color-window: var(--color-paper-50);
+  --color-sunken: var(--color-paper-100);
+  --color-titlebar: var(--color-paper-100);
+  --color-titlebar-inactive: var(--color-paper-50);
+  --color-edge: rgb(28 25 21 / 0.14);
+  --color-line: var(--color-paper-300);
+  --color-edge-dark: rgb(28 25 21 / 0.12);
+  --color-indicator: var(--color-ink-600);
+  --color-indicator-muted: var(--color-ink-400);
+  --color-fg: var(--color-ink-900);
+  --color-fg-muted: var(--color-ink-600);
+  --color-fg-subtle: var(--color-ink-500);
+  --color-fg-inverse: var(--color-ink-900);
+  --color-fg-inverse-muted: var(--color-ink-600);
+  --color-accent: var(--color-rust-600);
+  --color-accent-strong: var(--color-rust-700);
+  --color-accent-on-dark: var(--color-rust-600);
+  --color-on-accent: var(--color-paper-50);
+  --color-focus: var(--color-rust-600);
+  --color-selection: rgb(141 61 27 / 0.12);
+  --color-selection-desktop: rgb(141 61 27 / 0.14);
+  --color-taskbar: rgb(251 248 242 / 0.88);
+  --color-chrome-hover: rgb(28 25 21 / 0.06);
+  --color-chrome-press: rgb(28 25 21 / 0.12);
+  --color-glass-hover: rgb(28 25 21 / 0.06);
+  --color-glass-active: rgb(28 25 21 / 0.1);
+  --color-traffic-idle: var(--color-ink-500);
+  --wallpaper-glow: rgb(141 61 27 / 0.16);
+  --wallpaper-moss: rgb(77 124 79 / 0.12);
+  --wallpaper-dot: rgb(28 25 21 / 0.07);
+  --shadow-window:
+    0 1px 2px rgb(20 17 14 / 0.06), 0 8px 24px rgb(20 17 14 / 0.1);
+  --shadow-window-active:
+    0 1px 2px rgb(20 17 14 / 0.08), 0 18px 40px rgb(20 17 14 / 0.16);
+  --shadow-menu:
+    0 12px 32px rgb(20 17 14 / 0.12), 0 0 0 1px rgb(28 25 21 / 0.1);
+  --shadow-taskbar:
+    0 -1px 0 rgb(28 25 21 / 0.1), 0 -8px 24px rgb(20 17 14 / 0.06);
 }
 
 @custom-variant window-inactive (&:where([data-window]:not([data-active]) *));
@@ -127,17 +190,16 @@
 @utility bg-wallpaper {
   background-color: var(--color-desktop);
   background-image:
-    radial-gradient(60rem 40rem at 85% 10%, rgb(110 47 20 / 0.28), transparent 70%),
-    radial-gradient(50rem 36rem at 10% 100%, rgb(77 124 79 / 0.12), transparent 70%),
-    radial-gradient(rgb(251 248 242 / 0.06) 1px, transparent 1px);
-  background-size: auto, auto, 24px 24px;
+    radial-gradient(60rem 40rem at 85% 10%, var(--wallpaper-glow), transparent 70%),
+    radial-gradient(50rem 36rem at 10% 100%, var(--wallpaper-moss), transparent 70%),
+    radial-gradient(var(--wallpaper-dot) 1px, transparent 1px);
+  background-size:
+    auto,
+    auto,
+    24px 24px;
 }
 
 @layer base {
-  [data-surface='dark'] {
-    --color-focus: var(--color-rust-300);
-  }
-
   html {
     scroll-behavior: smooth;
   }

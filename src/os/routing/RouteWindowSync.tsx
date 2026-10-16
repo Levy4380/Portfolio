@@ -2,13 +2,10 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router';
 
 import { DocumentMeta } from '../../components/seo/DocumentMeta.tsx';
-import { getContent } from '../../content/registry.ts';
+import { getOpenable, NOT_FOUND_ID } from '../../content/catalog.ts';
 import { site } from '../../content/site.ts';
-import type { ContentItem } from '../../content/types.ts';
-import { useReadViewport, useWindowDispatch } from '../state/useWindowActions.ts';
-import { resolvePath, type RouteTarget } from './paths.ts';
-
-const NOT_FOUND_KEY = 'system:not-found' as const;
+import { useReadViewport, useWindowDispatch } from '../state/StateHelpers/useWindowActions.ts';
+import { resolvePath, type RouteTarget } from './RoutingHelpers/paths.ts';
 
 /**
  * Location changes become idempotent OPEN / SHOW_DESKTOP dispatches.
@@ -23,17 +20,22 @@ export function RouteWindowSync() {
   useEffect(() => {
     const target = resolvePath(pathname);
     switch (target.type) {
-      case 'content':
+      case 'content': {
+        const opened = getOpenable(target.contentId);
+        if (!opened) return;
         dispatch({
           type: 'OPEN',
-          contentKey: target.contentKey,
+          contentId: opened.id,
+          preset: opened.preset,
           viewport: readViewport(),
         });
         return;
+      }
       case 'not-found':
         dispatch({
           type: 'OPEN',
-          contentKey: NOT_FOUND_KEY,
+          contentId: NOT_FOUND_ID,
+          preset: 'dialog',
           viewport: readViewport(),
           meta: { requestedPath: target.requestedPath },
         });
@@ -65,16 +67,16 @@ function metaFor(target: RouteTarget): { title: string; description: string } {
         description: site.description,
       };
     case 'content': {
-      const item = getContent(target.contentKey);
-      if (!item || item.kind === 'link') {
+      const opened = getOpenable(target.contentId);
+      if (!opened) {
         return {
           title: `File not found — ${site.name}`,
           description: site.description,
         };
       }
       return {
-        title: `${item.title} — ${site.name}`,
-        description: descriptionOf(item),
+        title: `${opened.title} — ${site.name}`,
+        description: opened.summary ?? site.description,
       };
     }
     default: {
@@ -82,11 +84,4 @@ function metaFor(target: RouteTarget): { title: string; description: string } {
       return unreachable;
     }
   }
-}
-
-/** `summary` when the item has one, otherwise the long description, otherwise the site line. */
-function descriptionOf(item: Exclude<ContentItem, { kind: 'link' }>): string {
-  if (item.summary) return item.summary;
-  if (item.kind === 'project' || item.kind === 'experiment') return item.description;
-  return site.description;
 }

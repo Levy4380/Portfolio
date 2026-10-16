@@ -1,92 +1,91 @@
-import { useCallback, useId, useImperativeHandle, useState, type Ref } from 'react';
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  useCallback,
+  useId,
+  useImperativeHandle,
+  useState,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
+} from 'react';
 
-import type { ContentItem, ContentKey } from '../../content/types.ts';
 import { cn } from '../../lib/cn.ts';
-import { useRovingGrid } from '../a11y/useRovingGrid.ts';
-import type { IconGridProps, IconGridVariant } from '../contracts.ts';
-import { IconTile } from './IconTile.tsx';
+import { useRovingGrid } from '../a11y/A11yHelpers/useRovingGrid.ts';
+import type { IconGridVariant } from '../contracts.ts';
+import { IconGridContext, type IconGridContextValue } from './iconGridContext.tsx';
 
-// Arbitrary values are single-use structural grid tracks (design.md §11.5).
 const grid = {
   base: 'grid content-start gap-2',
-  // §8.2: mobile home-screen grid, tablet row-major top-left, desktop column-major top-left.
   desktop:
-    'grid-cols-3 justify-items-center p-4 pt-6 sm:grid-cols-4 md:grid-cols-[repeat(auto-fill,96px)] md:justify-start md:justify-items-start md:pt-4 lg:h-full lg:grid-flow-col lg:grid-cols-none lg:grid-rows-[repeat(auto-fill,104px)]',
+    'grid-cols-3 justify-items-center p-4 pt-6 sm:grid-cols-4 md:grid-cols-[repeat(auto-fill,96px)] md:justify-start md:justify-items-start md:pt-4 lg:h-full lg:grid-flow-col lg:grid-cols-none lg:grid-rows-[repeat(auto-fill,120px)]',
   window: 'grid-cols-[repeat(auto-fill,6rem)] justify-start',
 } as const satisfies Record<'base' | IconGridVariant, string>;
 
-function keyOf(item: ContentItem): ContentKey {
-  return `${item.kind}:${item.slug}`;
-}
-
-/** Lets the desktop clear a selection it does not own. Keyboard and pointer stay inside the grid. */
 export interface IconGridHandle {
   clearSelection: () => void;
 }
 
-export function IconGrid({
-  items,
-  variant,
-  ariaLabel,
-  onOpen,
-  className,
-  ref,
-}: IconGridProps & { ref?: Ref<IconGridHandle | null> }) {
+interface IndexedShortcut {
+  index?: number;
+}
+
+export interface IconGridProps {
+  variant: IconGridVariant;
+  ariaLabel: string;
+  className?: string;
+  children?: ReactNode;
+  ref?: Ref<IconGridHandle | null>;
+}
+
+/**
+ * Shared selection, roving tabindex, and the "Press Enter to open." hint.
+ * Shortcuts are children. The grid does not open anything itself.
+ */
+export function IconGrid({ variant, ariaLabel, className, children, ref }: IconGridProps) {
   const hintId = useId();
-  const [selectedKey, setSelectedKey] = useState<ContentKey | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const count = Children.toArray(children).filter(isValidElement).length;
+
+  const selectAt = useCallback((index: number) => {
+    const option = optionAt(index);
+    const id = option?.getAttribute('data-id');
+    if (id) setSelectedId(id);
+  }, []);
+
+  const activateAt = useCallback((index: number) => {
+    optionAt(index)?.click();
+  }, []);
+
+  const { containerRef, activeIndex, setActiveIndex, onKeyDown } = useRovingGrid({
+    count,
+    onMove: selectAt,
+    onSelect: selectAt,
+    onActivate: activateAt,
+  });
 
   useImperativeHandle(
     ref,
     () => ({
       clearSelection() {
-        setSelectedKey(null);
+        setSelectedId(null);
       },
     }),
     [],
   );
 
-  const select = useCallback((item: ContentItem) => {
-    setSelectedKey(keyOf(item));
-  }, []);
-
-  const open = useCallback(
-    (item: ContentItem) => {
-      if (item.kind === 'link') {
-        // External links are not windows; the grid never touches window state.
-        window.open(item.href, '_blank', 'noopener,noreferrer');
-        return;
-      }
-      onOpen(keyOf(item));
-    },
-    [onOpen],
-  );
-
-  const { containerRef, activeIndex, setActiveIndex, onKeyDown } = useRovingGrid({
-    count: items.length,
-    onMove: (index) => {
-      const item = items[index];
-      if (item) select(item);
-    },
-    onSelect: (index) => {
-      const item = items[index];
-      if (item) select(item);
-    },
-    onActivate: (index) => {
-      const item = items[index];
-      if (item) open(item);
-    },
-  });
-
-  const focusItem = useCallback(
-    (item: ContentItem) => {
-      const index = items.indexOf(item);
-      if (index !== -1) setActiveIndex(index);
-    },
-    [items, setActiveIndex],
-  );
+  const value: IconGridContextValue = {
+    variant,
+    hintId,
+    selectedId,
+    activeIndex,
+    select: setSelectedId,
+    focusIndex: setActiveIndex,
+  };
 
   return (
-    <>
+    <IconGridContext.Provider value={value}>
       <span id={hintId} className="sr-only">
         Press Enter to open.
       </span>
@@ -98,20 +97,29 @@ export function IconGrid({
         className={cn(grid.base, grid[variant], className)}
         onKeyDown={onKeyDown}
       >
-        {items.map((item, index) => (
-          <IconTile
-            key={keyOf(item)}
-            item={item}
-            variant={variant}
-            selected={keyOf(item) === selectedKey}
-            tabIndex={index === activeIndex ? 0 : -1}
-            describedBy={hintId}
-            onSelect={select}
-            onOpen={open}
-            onFocusItem={focusItem}
-          />
-        ))}
+        {withIndex(children)}
       </div>
-    </>
+    </IconGridContext.Provider>
   );
+}
+
+function optionAt(index: number): HTMLElement | undefined {
+  const list = document.activeElement?.closest('[role="listbox"]');
+  const options = list?.querySelectorAll<HTMLElement>('[role="option"]');
+  return options?.[index];
+}
+
+function withIndex(children: ReactNode): ReactNode {
+  return Children.map(children, (child, index) => {
+    if (!isValidElement<IndexedShortcut>(child)) return child;
+    return cloneElement(child as ReactElement<IndexedShortcut>, { index });
+  });
+}
+
+export function DesktopGrid(props: Omit<IconGridProps, 'variant'>) {
+  return <IconGrid variant="desktop" {...props} />;
+}
+
+export function FolderIconGrid(props: Omit<IconGridProps, 'variant'>) {
+  return <IconGrid variant="window" {...props} />;
 }

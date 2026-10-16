@@ -1,19 +1,13 @@
-import type { ExperimentItem, ProjectItem } from '../../content/types.ts';
+import type { ImageAsset } from '../../content/types.ts';
 
 type ProjectVisualProps = {
-  item: ProjectItem | ExperimentItem;
-  /** Opened by deep link: load the cover first instead of lazily. */
+  label: string;
+  cover?: ImageAsset;
   priority?: boolean;
 };
 
-function labelFor(item: ProjectItem | ExperimentItem): string {
-  return item.kind === 'project' ? item.category : 'Experiment';
-}
-
 /** Cover image, or a typographic placeholder. Never a broken image. */
-export function ProjectVisual({ item, priority = false }: ProjectVisualProps) {
-  const { cover } = item;
-
+export function ProjectVisual({ label, cover, priority = false }: ProjectVisualProps) {
   if (cover) {
     return (
       <img
@@ -30,13 +24,8 @@ export function ProjectVisual({ item, priority = false }: ProjectVisualProps) {
   }
 
   return (
-    <div
-      className="flex aspect-[16/10] items-end bg-sunken p-4"
-      aria-hidden="true"
-    >
-      <span className="font-display text-title text-fg-muted">
-        {labelFor(item)}
-      </span>
+    <div className="flex aspect-[16/10] items-end bg-sunken p-4" aria-hidden="true">
+      <span className="font-display text-title text-fg-muted">{label}</span>
     </div>
   );
 }

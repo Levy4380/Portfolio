@@ -7,8 +7,6 @@ import { FolderIcon } from './FolderIcon';
 
 export interface IconMapComponentProps {
   className?: string;
-  /** Folder icons tilt open when their window is visible. */
-  open?: boolean;
 }
 
 function FolderAboutIcon(props: IconMapComponentProps) {

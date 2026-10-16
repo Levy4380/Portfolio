@@ -1,19 +1,24 @@
 import { Layers } from 'lucide-react';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useCallback, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 
 import { cn } from '../../lib/cn.ts';
 import { taskbarItemPresence } from '../motion.ts';
-import { useWindowActions, useWindowState } from '../state/useWindowActions.ts';
-import { PinnedLinks } from './PinnedLinks.tsx';
-import { StartButton, type StartMenuFocus } from './StartButton.tsx';
-import { START_MENU_ID, StartMenu } from './StartMenu.tsx';
-import { TaskbarWindowItem } from './TaskbarWindowItem.tsx';
-import { TrayClock } from './TrayClock.tsx';
-import { WINDOW_SWITCHER_ID, WindowSwitcher } from './WindowSwitcher.tsx';
+import { useWindowActions, useWindowState } from '../state/StateHelpers/useWindowActions.ts';
+import { PinnedLinks } from './TaskbarComponents/PinnedLinks.tsx';
+import { StartButton, type StartMenuFocus } from './TaskbarComponents/StartButton.tsx';
+import { START_MENU_ID, StartMenu } from './TaskbarComponents/StartMenu.tsx';
+import { TaskbarWindowItem } from './TaskbarComponents/TaskbarWindowItem.tsx';
+import { TrayClock } from './TaskbarComponents/TrayClock.tsx';
+import { WINDOW_SWITCHER_ID, WindowSwitcher } from './TaskbarComponents/WindowSwitcher.tsx';
 
 /** Below Tailwind's `md` (768px). */
 const MOBILE_QUERY = '(max-width: 767.98px)';
+
+/** One surface at a time. Start and the switcher cannot both be open. */
+type TaskbarPanel =
+  | { kind: 'start'; focus: StartMenuFocus; focusRequest: number }
+  | { kind: 'switcher' };
 
 function subscribeMobile(onChange: () => void) {
   const query = window.matchMedia(MOBILE_QUERY);
@@ -37,45 +42,53 @@ export function Taskbar() {
 
   const startRef = useRef<HTMLButtonElement>(null);
   const windowsRef = useRef<HTMLButtonElement>(null);
-  const [startFocus, setStartFocus] = useState<StartMenuFocus | null>(null);
-  const [switcherRequested, setSwitcherRequested] = useState(false);
-  // The sheet only exists below `md`; resizing up closes it without an effect.
-  const switcherOpen = switcherRequested && mobile;
-  const startOpen = startFocus !== null;
+  const focusReturn = useRef<HTMLElement | null>(null);
+  const [panel, setPanel] = useState<TaskbarPanel | null>(null);
+  const [trackedMobile, setTrackedMobile] = useState(mobile);
+
+  // The sheet only exists below `md`. Clearing it with the viewport change
+  // means a later resize back down does not reopen it.
+  if (mobile !== trackedMobile) {
+    setTrackedMobile(mobile);
+    if (!mobile && panel?.kind === 'switcher') setPanel(null);
+  }
+
+  const startOpen = panel?.kind === 'start';
+  const switcherOpen = panel?.kind === 'switcher';
+
+  useLayoutEffect(() => {
+    if (panel !== null) return;
+    const node = focusReturn.current;
+    focusReturn.current = null;
+    node?.focus();
+  }, [panel]);
 
   const closeStart = useCallback((restoreFocus: boolean) => {
-    setStartFocus(null);
-    if (restoreFocus) startRef.current?.focus();
+    focusReturn.current = restoreFocus ? startRef.current : null;
+    setPanel((current) => (current?.kind === 'start' ? null : current));
   }, []);
 
   const closeSwitcher = useCallback((restoreFocus: boolean) => {
-    setSwitcherRequested(false);
-    if (restoreFocus) windowsRef.current?.focus();
+    focusReturn.current = restoreFocus ? windowsRef.current : null;
+    setPanel((current) => (current?.kind === 'switcher' ? null : current));
   }, []);
 
-  const openStart = (focus: StartMenuFocus) => {
-    setSwitcherRequested(false);
-    setStartFocus(focus);
-  };
-
   const toggleStart = () => {
-    if (startOpen) closeStart(false);
-    else openStart('first');
+    setPanel((current) =>
+      current?.kind === 'start' ? null : { kind: 'start', focus: 'first', focusRequest: 0 },
+    );
   };
 
   const openStartFromKey = (focus: StartMenuFocus) => {
-    if (!startOpen) {
-      openStart(focus);
-      return;
-    }
-    // Already open: move into it.
-    const items = document.querySelectorAll<HTMLElement>(`#${START_MENU_ID} [role="menuitem"]`);
-    (focus === 'last' ? items[items.length - 1] : items[0])?.focus();
+    setPanel((current) => ({
+      kind: 'start',
+      focus,
+      focusRequest: current?.kind === 'start' ? current.focusRequest + 1 : 0,
+    }));
   };
 
   const toggleSwitcher = () => {
-    setStartFocus(null);
-    setSwitcherRequested((open) => !open);
+    setPanel((current) => (current?.kind === 'switcher' ? null : { kind: 'switcher' }));
   };
 
   const itemMotion = taskbarItemPresence(reduced);
@@ -87,7 +100,6 @@ export function Taskbar() {
         id="taskbar"
         tabIndex={-1}
         aria-label="Taskbar"
-        data-surface="dark"
         className={cn(
           'fixed inset-x-0 bottom-0 z-1000 flex items-center gap-1 px-2 text-fg-inverse',
           'bg-taskbar shadow-taskbar backdrop-blur-md',
@@ -117,7 +129,7 @@ export function Taskbar() {
             {count > 0 ? (
               <span
                 aria-hidden
-                className="absolute right-1 top-1 grid min-w-4 place-items-center rounded-full bg-accent-on-dark px-1 font-mono text-meta font-semibold leading-4 tabular-nums text-ink-950"
+                className="absolute right-1 top-1 grid min-w-4 place-items-center rounded-full bg-accent-on-dark px-1 font-mono text-meta font-semibold leading-4 tabular-nums text-on-accent"
               >
                 {count}
               </span>
@@ -157,16 +169,17 @@ export function Taskbar() {
       </nav>
 
       <AnimatePresence>
-        {startOpen ? (
+        {panel?.kind === 'start' ? (
           <StartMenu
             key="start-menu"
             mobile={mobile}
-            initialFocus={startFocus}
+            initialFocus={panel.focus}
+            focusRequest={panel.focusRequest}
             triggerRef={startRef}
             onClose={closeStart}
           />
         ) : null}
-        {switcherOpen ? (
+        {panel?.kind === 'switcher' ? (
           <WindowSwitcher
             key="window-switcher"
             items={taskbarItems}

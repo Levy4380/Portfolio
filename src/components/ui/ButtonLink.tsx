@@ -20,7 +20,7 @@ const base =
   'focus-ring inline-flex min-h-8 items-center justify-center gap-2 rounded-control px-3 py-1.5 text-ui font-medium transition-colors duration-(--duration-fast) pointer-coarse:min-h-11 pointer-coarse:px-4';
 
 const variants = {
-  primary: 'bg-accent text-fg-inverse hover:bg-accent-strong',
+  primary: 'bg-accent text-on-accent hover:bg-accent-strong',
   secondary: 'border border-line bg-window text-fg hover:bg-chrome-hover',
 } as const;
 

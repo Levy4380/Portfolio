@@ -12,9 +12,8 @@ import {
 } from 'react';
 import { motion, useReducedMotion } from 'motion/react';
 
-import { announce } from '../a11y/announce.ts';
-import { getContent } from '../../content/registry.ts';
-import type { IconId } from '../../content/types.ts';
+import { announce } from '../a11y/A11yHelpers/announce.ts';
+import { titleFor } from '../../content/catalog.ts';
 import type { WindowFrameProps } from '../contracts.ts';
 import {
   duration,
@@ -24,17 +23,17 @@ import {
   windowSettled,
   type MotionOffset,
 } from '../motion.ts';
-import type { Bounds, Viewport, WindowInstance } from '../state/types.ts';
-import { useWindowActions } from '../state/useWindowActions.ts';
-import { getTaskbarAnchorRect } from '../taskbar/taskbarAnchors.ts';
+import type { Bounds, Viewport } from '../state/StateHelpers/types.ts';
+import { useWindowActions } from '../state/StateHelpers/useWindowActions.ts';
+import { getTaskbarAnchorRect } from '../taskbar/TaskbarHelpers/taskbarAnchors.ts';
 import { cn } from '../../lib/cn.ts';
-import { displayBounds } from './geometry.ts';
-import { presetFor } from './presets.ts';
-import { useWindowDrag } from './useWindowDrag.ts';
-import { useWindowResize } from './useWindowResize.ts';
-import { WindowBody } from './WindowBody.tsx';
-import { WindowResizeHandle } from './WindowResizeHandle.tsx';
-import { WindowTitleBar } from './WindowTitleBar.tsx';
+import { displayBounds } from './WindowsHelpers/geometry.ts';
+import { presetFor } from './WindowsHelpers/presets.ts';
+import { useWindowDrag } from './WindowsHelpers/useWindowDrag.ts';
+import { useWindowResize } from './WindowsHelpers/useWindowResize.ts';
+import { OpenedDocument, WindowBody } from './WindowsComponents/WindowBody.tsx';
+import { WindowResizeHandle } from './WindowsComponents/WindowResizeHandle.tsx';
+import { WindowTitleBar } from './WindowsComponents/WindowTitleBar.tsx';
 
 export interface WindowProps extends WindowFrameProps {
   /** Desktop-area viewport used by `displayBounds`. */
@@ -64,10 +63,8 @@ function WindowComponent({
   const wasMinimizedRef = useRef(instance.minimized);
   const announcedMinimizedRef = useRef(instance.minimized);
 
-  const content = windowPresentation(instance);
-  const title = content.title;
-  const icon = content.icon;
-  const preset = presetFor(instance.kind);
+  const title = titleFor(instance.contentId);
+  const preset = presetFor(instance.preset);
   const reduced = useReducedMotion() === true;
 
   const [concealed, setConcealed] = useState(false);
@@ -105,7 +102,7 @@ function WindowComponent({
 
   const getBounds = () => displayBounds(instance, layoutMode, viewport);
   const getViewport = () => viewport;
-  const getPreset = () => presetFor(instance.kind);
+  const getPreset = () => presetFor(instance.preset);
 
   const drag = useWindowDrag({
     enabled: canDrag,
@@ -273,8 +270,6 @@ function WindowComponent({
           'transition-[box-shadow,background-color,color] duration-fast ease-os-out motion-reduce:transition-none',
           flat ? 'rounded-none shadow-none' : 'rounded-window',
           !flat && (isActive ? 'shadow-window-active' : 'shadow-window'),
-          isActive &&
-            "before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:z-10 before:h-0.5 before:bg-accent before:content-['']",
         )}
         initial={presence.initial}
         animate={animate}
@@ -289,8 +284,6 @@ function WindowComponent({
         <WindowTitleBar
           titleId={titleId}
           title={title}
-          icon={icon}
-          folderOpen={content.folderOpen && phase === 'visible'}
           isActive={isActive}
           layoutMode={layoutMode}
           showMaximize={showMaximize}
@@ -300,14 +293,27 @@ function WindowComponent({
           onClose={() => actions.closeWindow(instance.id)}
           onPointerDown={drag.onPointerDown}
           onDoubleClick={onDoubleClick}
-        />
+        >
+          {title}
+        </WindowTitleBar>
         <div
           className={cn(
             'flex min-h-0 flex-1 flex-col transition-opacity duration-fast ease-os-out motion-reduce:transition-none',
             dimmed && 'opacity-0',
           )}
         >
-          <WindowBody instance={instance} isActive={isActive} />
+          <WindowBody
+            documentId={instance.contentId}
+            instanceId={instance.id}
+            isActive={isActive}
+            requestedPath={instance.meta?.requestedPath}
+          >
+            <OpenedDocument
+              documentId={instance.contentId}
+              windowId={instance.id}
+              requestedPath={instance.meta?.requestedPath}
+            />
+          </WindowBody>
         </div>
         {canResize ? (
           <WindowResizeHandle onPointerDown={resize.onPointerDown} />
@@ -318,25 +324,6 @@ function WindowComponent({
 }
 
 export const Window = memo(WindowComponent);
-
-function windowPresentation(instance: WindowInstance): {
-  title: string;
-  icon: IconId;
-  folderOpen: boolean;
-} {
-  const item = getContent(instance.contentKey);
-  if (item && item.kind !== 'link') {
-    return {
-      title: item.title,
-      icon: item.icon,
-      folderOpen: item.kind === 'folder',
-    };
-  }
-  if (instance.kind === 'system') {
-    return { title: 'File not found', icon: 'file-missing', folderOpen: false };
-  }
-  return { title: 'Window', icon: 'file-missing', folderOpen: false };
-}
 
 function isMinimizeDefinition(definition: unknown): boolean {
   return (

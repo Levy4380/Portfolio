@@ -40,7 +40,7 @@ No other runtime dependency is required by this specification. Do not add Redux,
 
 The portfolio is a small, personal operating system that runs in the browser. Visitors arrive at a desktop, open folders, and launch documents that describe the owner's work: who they are (About Me), what they have shipped for clients and for themselves (Projects), and what they are tinkering with (Experiments).
 
-The working name of the visual identity is **Warm Workstation**. It borrows the *interaction grammar* of Windows 7 (desktop icons, a bottom taskbar, a Start menu, title bars with minimize/maximize/close, windows that stack) and pairs it with the *material* of the current site: warm paper, deep ink, and a rust accent. The desktop is dark and calm; windows are light, paper-like documents sitting on it. The result should feel like a well-kept personal machine, not a skin of someone else's OS.
+The working name of the visual identity is **Warm Workstation**. It borrows the *interaction grammar* of a desktop (icons, a bottom taskbar, a Start menu, windows that stack) and pairs it with the *material* of the current site: deep ink, warm paper type, and a rust accent. The default theme is dark and calm: the desktop and the windows share the same ink, with light type and — in folders — a floating sidebar. A light theme turns those same roles onto paper. Rust, moss and amber stay the palette's own accents. The result should feel like a well-kept personal machine, not a skin of someone else's OS.
 
 ### 1.2 Design principles
 
@@ -94,40 +94,50 @@ The ink, paper and rust ramps extend the existing tokens (`--color-ink #1c1915`,
 
 ### 2.2 Semantic color tokens
 
-| Semantic token | Value | Utility examples | Use |
-| --- | --- | --- | --- |
-| `--color-desktop` | `ink-950` | `bg-desktop` | Wallpaper base |
-| `--color-window` | `paper-50` | `bg-window` | Window body |
-| `--color-sunken` | `paper-100` | `bg-sunken` | Address bar, code blocks, image placeholders |
-| `--color-titlebar` | `paper-200` | `bg-titlebar` | Active title bar |
-| `--color-titlebar-inactive` | `paper-100` | `bg-titlebar-inactive` | Inactive title bar |
-| `--color-edge` | `rgb(28 25 21 / 0.14)` | `border-edge` | Window outer border |
-| `--color-line` | `paper-300` | `border-line`, `divide-line` | Hairlines inside windows |
-| `--color-edge-dark` | `ink-700` | `border-edge-dark` | Dividers on dark surfaces |
-| `--color-indicator` | `ink-300` | `bg-indicator` | Open-window taskbar indicator |
-| `--color-indicator-muted` | `ink-400` | `bg-indicator-muted`, `ring-indicator-muted` | Minimized dot, neutral selection ring, resize-handle lines (decorative only) |
-| `--color-fg` | `ink-900` | `text-fg` | Primary text on light |
-| `--color-fg-muted` | `ink-600` | `text-fg-muted` | Secondary text on light |
-| `--color-fg-subtle` | `ink-500` | `text-fg-subtle` | Meta text, inactive titles |
-| `--color-fg-inverse` | `paper-50` | `text-fg-inverse` | Text on dark (desktop, taskbar, Start menu) |
-| `--color-fg-inverse-muted` | `ink-300` | `text-fg-inverse-muted` | Secondary text on dark |
-| `--color-accent` | `rust-600` | `text-accent`, `bg-accent` | Links, active indicators on light |
-| `--color-accent-strong` | `rust-700` | `bg-accent-strong` | Pressed accent |
-| `--color-accent-on-dark` | `rust-300` | `bg-accent-on-dark` | Active taskbar indicator, accents on dark |
-| `--color-focus` | `rust-600` (re-scoped to `rust-300` on dark surfaces) | `outline-focus` | Focus ring |
-| `--color-selection` | `rgb(141 61 27 / 0.12)` | `bg-selection` | Selected tile in a window |
-| `--color-selection-desktop` | `rgb(141 61 27 / 0.85)` | `bg-selection-desktop` | Selected icon label on the desktop |
-| `--color-taskbar` | `rgb(28 25 21 / 0.82)` | `bg-taskbar` | Taskbar and Start menu glass |
-| `--color-chrome-hover` | `rgb(28 25 21 / 0.08)` | `bg-chrome-hover` | Window control hover on light |
-| `--color-chrome-press` | `rgb(28 25 21 / 0.14)` | `bg-chrome-press` | Window control pressed on light |
-| `--color-glass-hover` | `rgb(251 248 242 / 0.10)` | `bg-glass-hover` | Hover on taskbar and Start menu |
-| `--color-glass-active` | `rgb(251 248 242 / 0.16)` | `bg-glass-active` | Active taskbar item |
-| `--color-danger` | `danger-600` | `bg-danger` | Close-button hover |
-| `--color-folder-about` / `-projects` / `-experiments` | `moss-600` / `rust-500` / `amber-600` | `fill-folder-projects` | Folder label tab |
+Components consume semantic tokens only. The dark theme is the default (`@theme` in `src/styles/index.css`). The light theme is the same list of roles remapped on `html[data-theme="light"]`. There is no per-window color scope and no `data-surface` attribute: desktop, windows, taskbar and menus all read the active theme.
 
-**Surface scoping.** Every dark surface (desktop, taskbar, Start menu, mobile switcher) carries `data-surface="dark"`. A base-layer rule re-maps `--color-focus` to `rust-300` there, so a single `focus-ring` utility works everywhere (see §11.4).
+The choice is stored in `localStorage` under `portfolio-theme` and painted on `<html>` before the bundle runs, so a saved light theme does not flash dark. The Start menu's Appearance group holds a `menuitemcheckbox` labelled "Light theme".
+
+| Semantic token | Dark (default) | Light | Use |
+| --- | --- | --- | --- |
+| `--color-desktop` | `ink-950` | `paper-200` | Wallpaper base |
+| `--color-window` | `ink-950` | `paper-50` | Window body |
+| `--color-sunken` | `ink-800` | `paper-100` | Sidebar, code blocks, image placeholders |
+| `--color-titlebar` | `ink-950` | `paper-100` | Active title bar |
+| `--color-titlebar-inactive` | `ink-900` | `paper-50` | Inactive title bar |
+| `--color-edge` | `rgb(251 248 242 / 0.16)` | `rgb(28 25 21 / 0.14)` | Window outer border |
+| `--color-line` | `rgb(251 248 242 / 0.10)` | `paper-300` | Hairlines inside windows |
+| `--color-edge-dark` | `ink-700` | `rgb(28 25 21 / 0.12)` | Taskbar and menu dividers |
+| `--color-indicator` | `ink-300` | `ink-600` | Open-window taskbar indicator |
+| `--color-indicator-muted` | `ink-400` | `ink-400` | Minimized dot, resize-handle lines (decorative) |
+| `--color-fg` | `paper-50` | `ink-900` | Primary text on windows |
+| `--color-fg-muted` | `ink-300` | `ink-600` | Secondary text on windows |
+| `--color-fg-subtle` | `ink-300` | `ink-500` | Inactive titles |
+| `--color-fg-inverse` | `paper-50` | `ink-900` | Text on the desktop, taskbar and Start menu |
+| `--color-fg-inverse-muted` | `ink-300` | `ink-600` | Secondary text on the desktop and taskbar |
+| `--color-accent` | `rust-300` | `rust-600` | Links, primary buttons |
+| `--color-accent-strong` | `rust-500` | `rust-700` | Pressed or hovered accent |
+| `--color-accent-on-dark` | `rust-300` | `rust-600` | Taskbar indicator, Start monogram, desktop selection ring |
+| `--color-on-accent` | `ink-950` | `paper-50` | Text on `accent` and `accent-on-dark` fills |
+| `--color-focus` | `rust-300` | `rust-600` | Focus ring |
+| `--color-selection` | `rgb(251 248 242 / 0.14)` | `rgb(141 61 27 / 0.12)` | Selected tile in a window |
+| `--color-selection-desktop` | `rgb(141 61 27 / 0.85)` | `rgb(141 61 27 / 0.14)` | Selected icon label on the desktop |
+| `--color-taskbar` | `rgb(28 25 21 / 0.82)` | `rgb(251 248 242 / 0.88)` | Taskbar and Start menu glass |
+| `--color-chrome-hover` | `rgb(251 248 242 / 0.08)` | `rgb(28 25 21 / 0.06)` | Hover inside a window |
+| `--color-chrome-press` | `rgb(251 248 242 / 0.16)` | `rgb(28 25 21 / 0.12)` | Pressed control inside a window |
+| `--color-glass-hover` | `rgb(251 248 242 / 0.10)` | `rgb(28 25 21 / 0.06)` | Hover on taskbar and Start menu |
+| `--color-glass-active` | `rgb(251 248 242 / 0.16)` | `rgb(28 25 21 / 0.10)` | Active taskbar item |
+| `--color-danger` | `danger-600` | `danger-600` | Danger fill |
+| `--color-traffic-close` / `-minimize` / `-zoom` | `danger-600` / `amber-600` / `moss-600` | same | Active traffic-light discs |
+| `--color-traffic-idle` | `ink-700` | `ink-500` | Inactive traffic-light discs |
+| `--color-traffic-glyph` | `ink-950` | `ink-950` | Glyph on a traffic-light disc |
+| `--color-folder-about` / `-projects` / `-experiments` | `moss-600` / `rust-500` / `amber-600` | same | Folder accent (content only; the icon is the shared Finder blue) |
+
+Wallpaper glows and window shadows are theme values too (`--wallpaper-glow`, `--wallpaper-moss`, `--wallpaper-dot`, and the four `--shadow-*` tokens). Light shadows are softer and the menu shadow keeps a 1px ink ring so the panel separates from the paper desktop.
 
 ### 2.3 Contrast pairs (WCAG 2.2 AA, verified)
+
+The pairs below are the **light** theme. In the dark theme, `fg` (`paper-50`) on `window` (`ink-950`) is above 14:1, `fg-muted` (`ink-300`) on `ink-950` is about 8:1, `accent` and the focus ring (`rust-300` on `ink-950`) are about 8.6:1, and `on-accent` (`ink-950`) on `rust-300` is the same pair. `selection-desktop` stays a rust chip with paper type in dark, and a light rust wash with ink type in light, so the label and its fill flip together.
 
 | Foreground | Background | Ratio | Allowed for |
 | --- | --- | --- | --- |
@@ -189,7 +199,7 @@ Tailwind 4's default `--spacing: 0.25rem` already gives a 4px scale (`p-1` = 4px
 | Taskbar internal padding / item gap | 8px / 4px | `px-2 gap-1` |
 | Desktop safe gutter around windows and icons | 16px | constant `GUTTER = 16` (§7) |
 
-Layout constants that JavaScript also needs (taskbar height, title bar height, gutter, cascade step) live in `src/os/windows/geometry.ts` **and** are mirrored as plain custom properties on `:root` (`--os-taskbar-h`, `--os-titlebar-h`) for use in `calc()`. Those are not `@theme` tokens because they don't need utilities.
+Layout constants that JavaScript also needs (taskbar height, title bar height, gutter, cascade step) live in `src/os/windows/WindowsHelpers/geometry.ts` **and** are mirrored as plain custom properties on `:root` (`--os-taskbar-h`, `--os-titlebar-h`) for use in `calc()`. Those are not `@theme` tokens because they don't need utilities.
 
 ### 2.6 Radius and borders
 
@@ -229,38 +239,31 @@ At the bottom-right of the desktop, above the taskbar, a single monospaced line 
 ### 2.9 Window chrome anatomy
 
 ```
-┌──────────────────────────────────────────────────────────────┐ ← 2px accent line (active only), radius-window
-│ [icon16] Catalog storefront                    [–] [□] [×]   │ ← title bar, h-10 (40px), bg-titlebar
-├──────────────────────────────────────────────────────────────┤
-│ ~/projects/catalog-storefront           [Visit site ↗] [Src] │ ← optional toolbar, h-10, border-b line
-├──────────────────────────────────────────────────────────────┤
-│                                                              │
-│  Window body (bg-window, scrolls independently)              │
-│                                                              │
-├──────────────────────────────────────────────────────────────┤
-│ 3 items · 1 selected                                     [◢] │ ← optional status bar h-7 + resize handle
+┌──────────────────────────────────────────────────────────────┐ ← radius-window, theme frame, no accent stripe
+│ [●][●][●]  Projects                                          │ ← title bar, h-10, lights then the title
+│ ┌────────────┐                                               │
+│ │ About Me   │                                               │
+│ │ Projects   │     icon grid                                 │ ← sidebar floats: inset, rounded, bg-sunken
+│ │ Experiments│                                               │
+│ └────────────┘                                               │
+│ /Desktop/Projects                                   3 items  │
 └──────────────────────────────────────────────────────────────┘
 ```
 
 | Part | Spec |
 | --- | --- |
-| Frame | `rounded-window border border-edge bg-window overflow-hidden flex flex-col`; `shadow-window` or `shadow-window-active`. |
-| Accent line | Active window only: `before:` pseudo-element, 2px tall, `bg-accent`, full width, at the top edge inside the radius. |
-| Title bar | `h-10 px-3 gap-2 flex items-center select-none`; `bg-titlebar` when active, `bg-titlebar-inactive` when inactive. Icon is 16px. Title is `text-ui font-semibold truncate`, `text-fg` when active and `text-fg-subtle` when inactive. Cursor: `default` (not `move`); the title bar is grabbable only in desktop layout. |
-| Controls | Order: Minimize (`Minus`), Maximize/Restore (`Square` / `Copy`), Close (`X`). Lucide icons at 14px, `strokeWidth={1.75}`, `aria-hidden`. Buttons are 36×28 (`h-7 w-9 rounded-control`), 44×44 on coarse pointers. Hover `bg-chrome-hover`, pressed `bg-chrome-press`, Close hover `bg-danger text-fg-inverse`. Maximize is omitted for `dialog` windows and below `lg`. |
-| Toolbar | Optional, per renderer. Contains a read-only address field (`bg-sunken rounded-control px-2 h-7 font-mono text-meta text-fg-muted truncate`) showing the path such as `~/projects/catalog-storefront`, and renderer actions as `ButtonLink`s. |
+| Frame | `rounded-window border border-edge bg-window overflow-hidden flex flex-col`; `shadow-window` or `shadow-window-active`. No accent stripe. Colors come from the active theme in §2.2. |
+| Title bar | `h-10 px-2.5 flex items-center gap-2 select-none`; `bg-titlebar` when active, `bg-titlebar-inactive` when inactive. Traffic lights lead. The visible title is the `h2` immediately after them (`text-ui font-semibold`, `text-fg` active, `text-fg-subtle` inactive, `truncate` plus a `title` attribute). Cursor: `default` (not `move`); the title bar is grabbable only in desktop layout. |
+| Controls | Leading edge, tight cluster, order: Close, Minimize, Zoom (`toggleMaximize`). Each control is a 12px disc inside a 20px hit (`size-5`), 44×44 on coarse pointers and below `md`. Glyphs (`X`, `Minus`, `Square` / `Copy`, `aria-hidden`, `text-traffic-glyph`) are hidden until the cluster is hovered or focused. Active: Close `bg-traffic-close`, Minimize `bg-traffic-minimize`, Zoom `bg-traffic-zoom`. Inactive: `bg-traffic-idle`, and the active colors return on hover. Zoom is omitted for `dialog` windows and below `lg`. |
+| Folder chrome | The folder name lives in the title bar, beside the lights. From `md` up, a floating sidebar (`w-44 rounded-menu bg-sunken`, inset by padding, not a flush column) lists desktop folders. The current row is `bg-window` with `aria-current="page"`. The icon grid and the path/count line occupy the remaining column and scroll without moving the sidebar. Below `md` there is no sidebar. |
+| Toolbar | Document windows may keep action buttons (`ButtonLink`). Folder windows do not repeat the title under the lights. |
 | Body | `flex-1 min-h-0 overflow-y-auto overscroll-contain`. Padding per §2.5. |
-| Status bar | Folder windows only: `h-7 px-3 border-t border-line font-mono text-meta text-fg-subtle tabular-nums`, for example `3 items · 1 selected`. |
+| Status bar | Folder windows only: one quiet line, path in mono on the left and the item count on the right (`text-meta text-fg-muted`). |
 | Resize handle | Bottom-right 16×16 hit area, `cursor-nwse-resize`, three diagonal 1px lines in `indicator-muted`. Only in desktop layout on resizable presets. |
 
 ### 2.10 Icons
 
-**Folder icons** are original SVG components (`src/icons/FolderIcon.tsx`) drawn on a 48×48 grid:
-
-- A back panel (`paper-400`) with a tab on the left, plus a front panel (`paper-100`) with a 1px `ink-900/15` stroke and a 2px corner radius.
-- A 12×4 colored **label tab** at the front's top-left in the folder's accent (`folder-about` moss, `folder-projects` rust, `folder-experiments` amber).
-- A Lucide glyph stamped at the center of the front panel at 18px in `ink-600`: `User` (About Me), `BriefcaseBusiness` (Projects), `FlaskConical` (Experiments).
-- The `open` prop (used while the folder's window is open and visible) rotates the front panel open by ~8°.
+**Folder icons** (`src/icons/FolderIcon.tsx`) share one blue folder silhouette, displayed at 48px. A Lucide glyph sits on the front face in `#165f96`: `User` (About Me), `BriefcaseBusiness` (Projects), `FlaskConical` (Experiments).
 
 **File icons** (`src/icons/FileIcon.tsx`) use a 40×48 sheet with a 10px folded corner, `paper-50` fill, `ink-900/15` stroke, and a 16px Lucide glyph by kind:
 
@@ -275,12 +278,12 @@ If a project has a `cover` image, folder windows may show it as a 40×48 cropped
 
 **Brand icons** (`src/icons/brand.tsx`): `GitHubMark`, `LinkedInMark` and `InstagramMark` are single-color inline SVGs using `currentColor`. They accept the same `size` and `className` props as Lucide icons so they're interchangeable.
 
-**Icon registry.** `src/icons/iconMap.ts` maps a string `IconId` (used in content data) to a component. Content files reference `icon: 'folder-projects'` rather than importing React components, which keeps content serializable.
+**Icon drawings.** `FolderIcon` takes `accent` and `FileIcon` takes `kind`. Shortcuts and the taskbar pass those values from the opened component. `iconMap.ts` remains for the older string ids; new tiles do not add a `fileToRender` string.
 
 ### 2.11 Taskbar
 
 - Fixed to the bottom, full width, `h-12` (48px) on `md` and up, `h-14` (56px) plus `pb-[env(safe-area-inset-bottom)]` below `md`.
-- `bg-taskbar backdrop-blur-md shadow-taskbar`, `data-surface="dark"`, `z-1000`.
+- `bg-taskbar backdrop-blur-md shadow-taskbar`, `z-1000`. Color comes from the active theme.
 - Layout, from left to right:
   1. Start button: a 48×40 button with a custom monogram glyph (the owner's initials in `font-mono` set inside a rounded square) and no "Start" text. Accessible name: "Start".
   2. Pinned links: GitHub, LinkedIn, Instagram (40×40 icon buttons). Hidden below `md`, where they're only in the Start menu.
@@ -328,25 +331,24 @@ flowchart TD
   DesktopEnvironment --> WindowProvider
   WindowProvider --> RouteWindowSync
   WindowProvider --> DesktopBackground
-  WindowProvider --> DesktopIcons
+  WindowProvider --> Desktop
   WindowProvider --> WindowManager
   WindowProvider --> Taskbar
   WindowProvider --> LiveAnnouncer
-  DesktopIcons --> IconGrid
-  IconGrid --> IconTile
+  Desktop --> DesktopGrid
+  DesktopGrid --> FolderShortcut
+  FolderShortcut --> IconTile
   WindowManager --> Window
   Window --> WindowTitleBar
   WindowTitleBar --> WindowControls
   Window --> WindowBody
   Window --> WindowResizeHandle
-  WindowBody --> WindowErrorBoundary
-  WindowErrorBoundary --> RendererSwitch
-  RendererSwitch --> FolderWindow
-  RendererSwitch --> ProjectWindow
-  RendererSwitch --> ExperimentWindow
-  RendererSwitch --> AboutWindow
-  RendererSwitch --> NotFoundWindow
-  FolderWindow --> IconGrid
+  WindowBody --> OpenedDocument
+  OpenedDocument --> FolderComponent
+  OpenedDocument --> FileComponent
+  OpenedDocument --> NotFoundDocument
+  FolderComponent --> FolderIconGrid
+  FolderIconGrid --> FileShortcut
   Taskbar --> StartButton
   Taskbar --> StartMenu
   Taskbar --> PinnedLinks
@@ -358,40 +360,39 @@ flowchart TD
 
 ### 3.2 Responsibilities
 
-The proposed names in the brief map to the final components like this: `DesktopIcon`, `DesktopFolder` and `FileItem` collapse into one `IconTile`, because they share structure, states and keyboard behavior. `FileGrid` becomes `IconGrid` and is used both on the desktop and inside folder windows. `WindowContent` is named `WindowBody`. `WindowContext` is split into a state context and a dispatch context.
+`IconTile` is the shared tile (structure, states, keyboard). `DesktopGrid` and `FolderIconGrid` are the two public grids; both are `IconGrid` with `variant="desktop"` or `variant="window"`. `FolderShortcut` and `FileShortcut` are the tiles the author writes; `FolderIcon` and `FileIcon` stay the SVG drawings. `WindowContent` is named `WindowBody`. `WindowContext` is split into a state context and a dispatch context. The author composes the desktop, each folder, and each file by children. A catalog built when those modules load is only an index of `id` and `path`, not the tree.
 
 | Category | Component / module | Responsibility | Must not |
 | --- | --- | --- | --- |
 | **Structural** | `DesktopEnvironment` | The single route component. Owns the full-viewport shell (`h-dvh overflow-hidden`), mounts `WindowProvider`, renders the page `<h1>` (visually hidden) and skip links. | Hold window state itself. |
 | Structural | `DesktopBackground` | Wallpaper layer; handles `pointerdown` on empty desktop (clears selection, dispatches `BLUR`). | Render icons. |
-| Structural | `DesktopIcons` | Reads root items (`parent: 'desktop'`) from the registry and renders an `IconGrid` in `variant="desktop"`. | Know about specific folders. |
+| Structural | `Desktop` | The desktop the author writes: a `DesktopGrid` whose children are `FolderShortcut`s (`folder={AboutMeFolder}` and the other two). | Dispatch window actions. The shortcut calls `openContent`. |
 | Structural | `WindowManager` | Maps `state.windows` (in stable `openedAt` order) to `Window`s, passing derived `isActive`, `zIndex` and `layoutMode`. Listens to viewport resize and dispatches `VIEWPORT_CHANGED`. Wraps windows in `AnimatePresence`. | Reorder DOM nodes when focus changes. |
-| Structural | `Window` | Frame, geometry (inline `transform`, `width`, `height`, `zIndex`), focus-on-pointerdown, minimize/restore animation phases, `hidden`/`inert`, drag and resize wiring, last-focused-element memory. `memo`-ized. | Know what content it shows beyond title and icon. |
-| Structural | `WindowTitleBar` | Icon, `<h2>` title, drag start, double-click to maximize. | Contain content actions. |
-| Structural | `WindowBody` | Scroll container, `Suspense` fallback, error boundary, renderer switch. Memoized on `contentKey` so moving and focusing don't re-render content. | Read window manager state. |
+| Structural | `Window` | The only frame. Geometry (inline `transform`, `width`, `height`, `zIndex`), focus-on-pointerdown, minimize/restore animation phases, `hidden`/`inert`, drag and resize wiring, last-focused-element memory. `memo`-ized. Composes `WindowTitleBar` and `WindowBody`. | Be returned by a folder or a document. |
+| Structural | `WindowTitleBar` | Traffic lights, drag start, double-click to maximize. The `<h2>` paints `children`. The `title` string stays for the tooltip, control names, `aria-labelledby`, announce, and the taskbar. | Contain content actions. |
+| Structural | `WindowBody` | Scroll container, `Suspense` fallback (skeleton), error boundary. Memoized on document `id`, `instance.id`, and `isActive` (and `requestedPath` for the not-found dialog) so a drag does not re-render the document. The document element is `OpenedDocument`, itself memoized without `isActive`, so focus does not redraw it. | Look up content by a `kind` switch. |
 | Structural | `WindowResizeHandle` | Bottom-right pointer resize in desktop layout. | Exist below `lg`. |
 | Structural | `Taskbar` | Layout of the Start button, pinned links, window list and tray. | Keep its own list of windows. |
-| **Presentational** | `IconGrid` | Roving-tabindex listbox of `IconTile`s, local selection state, 2D arrow navigation, open-on-activate callback. | Dispatch window actions directly; it calls `onOpen(key)`. |
+| **Presentational** | `DesktopGrid`, `FolderIconGrid` | Public faces of `IconGrid`. Roving-tabindex listbox, local selection, 2D arrow navigation, hint "Press Enter to open.", `clearSelection` handle. Children are shortcuts. They do not receive `items`. | Dispatch window actions. Links are not children; they stay on the taskbar. |
+| Presentational | `FolderShortcut`, `FileShortcut` | One tile. `folder={AboutMeFolder}` or `file={ProfileFile}`. Draws `FolderIcon` (`accent`) or `FileIcon` (`kind`) from the component it already holds, then calls `openContent`. | Accept a string name (`fileToRender`, `folderToRender`) or rename the SVG components. |
 | Presentational | `IconTile` | Icon plus label plus optional file-name line; `desktop` and `window` variants. | Manage selection itself. |
 | Presentational | `WindowControls` | Three buttons with accessible names; calls handlers it receives. | Decide what minimize means. |
-| Presentational | `StartButton`, `StartMenu` | Menu button and menu with full keyboard pattern; entries from `startMenu` config. | Hardcode links. |
+| Presentational | `StartButton`, `StartMenu` | Menu button and menu with full keyboard pattern. Places are the folder components. Elsewhere links use `href`s from `site.ts`. | Call `getContent`. |
 | Presentational | `TaskbarWindowItem` | One button per window instance. Click: restore/focus, or minimize if already active. Middle click (`auxclick`, button 1) closes. Registers its DOM rect for the minimize animation target. | Derive state on its own. |
 | Presentational | `WindowSwitcher` | Sheet listing all windows with restore and close (mobile and overflow). | |
 | Presentational | `TrayClock`, `PinnedLinks` | Small leaf components. | |
-| Presentational | `FolderWindow` | Toolbar address, `IconGrid variant="window"` of children, status bar. | Contain per-folder hardcoded lists. |
-| Presentational | `ProjectWindow` | Project document: toolbar actions, cover, title, meta row, description, `TechList`, `ProjectGallery`. | |
-| Presentational | `ExperimentWindow` | Experiment document plus an optional lazy demo behind a "Run" button. | Auto-run heavy demos. |
-| Presentational | `AboutWindow` | Renders a profile section (`profile`, `experience`, `skills`, `contact`). | |
-| Presentational | `NotFoundWindow` | "File not found" dialog with the requested path and an "Open Projects" action. | |
-| Presentational | `ProjectCard` (existing, restyled) | Used only inside `AboutWindow` → profile's "Selected work" strip; activating a card opens the project window. | Link with `<Link>` directly; it calls `openContent`. |
+| Presentational | Folder components (`AboutMeFolder`, `ProjectsFolder`, `ExperimentsFolder`) | The window body, not a `Window`. One parent: sidebar plus `FolderIconGrid`. Files are written as `FileShortcut` children. Sidebar rows are the same folder components the desktop lists, and they open with `originId`. Empty grid shows the folder's `emptyText`. | Call `getChildren`. Return `<Window>`. |
+| Presentational | File components (`ProfileFile`, project files, experiment files) | The document only: the markup that used to live in the profile, project, and experiment windows. | Return `<Window>`. |
+| Presentational | `NotFoundDocument` | "File not found" dialog for a path no component registered. "Open Projects" calls `openContent(ProjectsFolder)`. | Be a catalog row. |
+| Presentational | `ProjectCard` (existing, restyled) | Used inside `ProfileFile`'s "Selected work" strip; activating a card calls `openContent` on that project component. | Link with `<Link>` directly. |
 | **State** | `windowReducer.ts` | Pure transitions (§4.4). | Touch the DOM, router or `Date.now()` (sequence numbers come from state). |
 | State | `WindowProvider.tsx` | `useReducer`, exposes `WindowStateContext` and `WindowDispatchContext`. | |
 | State | `useWindowActions.ts` | Action creators that dispatch **and** perform the matching navigation (§5.3). This is the only place UI calls into the window manager. | |
-| State | `selectors.ts` | `selectActiveId`, `selectTaskbarItems`, `selectZIndex`, `selectNextActive`, `selectByContentKey`. | |
+| State | `selectors.ts` | `selectActiveId`, `selectTaskbarItems`, `selectZIndex`, `selectNextActive`, `selectByContentId`. | |
 | State | `taskbarAnchors.ts` | A ref-based `Map<WindowId, HTMLElement>` in its own context, for minimize/restore animation targets. Not React state. | Trigger renders. |
-| **Content** | `src/content/*` | Typed data, registry, lookups and dev-time validation (§6). | Import React components. |
-| Content | `src/icons/*` | Folder, file and brand icons, plus `iconMap`. | |
-| **Routing** | `src/os/routing/paths.ts` | Pure `resolvePath(pathname)` and `pathFor(contentKey)`. | Use hooks. |
+| **Content** | `src/content/*` | Desktop, folder, and file components. Each openable declares `id`, `path`, `title`, and `preset` on the component. Importing the modules fills a path/id index (§6). `site.ts` stays the name, role, and external URLs. | Put JSX in the reducer. Keep a second JSON tree of folders and files. |
+| Content | `src/icons/*` | `FolderIcon` (`accent`) and `FileIcon` (`kind`) drawings, plus brand marks. Shortcuts are not these files. | |
+| **Routing** | `src/os/routing/RoutingHelpers/paths.ts` | Pure `resolvePath(pathname)` and `pathFor(contentId)`, against the component index. | Use hooks. Consult a content registry. |
 | Routing | `RouteWindowSync` (a component wrapping `useRouteWindowSync`) | Turns location changes into idempotent `OPEN`/`SHOW_DESKTOP` dispatches; drives `DocumentMeta`. Renders `null` + `DocumentMeta`. | Navigate. |
 | Routing | `DocumentMeta` (existing) | Title, description, canonical link, now fed by the resolved route content. | |
 
@@ -404,24 +405,31 @@ src/
   os/
     DesktopEnvironment.tsx
     desktop/DesktopBackground.tsx
-    desktop/DesktopIcons.tsx
-    grid/IconGrid.tsx
-    grid/IconTile.tsx
-    taskbar/Taskbar.tsx  StartButton.tsx  StartMenu.tsx  PinnedLinks.tsx
-    taskbar/TaskbarWindowItem.tsx  WindowSwitcher.tsx  TrayClock.tsx
-    taskbar/taskbarAnchors.ts
-    windows/WindowManager.tsx  Window.tsx  WindowTitleBar.tsx  WindowControls.tsx
-    windows/WindowBody.tsx  WindowResizeHandle.tsx  WindowErrorBoundary.tsx
-    windows/geometry.ts  presets.ts  useWindowDrag.ts  useWindowResize.ts  useLayoutMode.ts
-    state/types.ts  windowReducer.ts  selectors.ts  WindowProvider.tsx  useWindowActions.ts
-    routing/paths.ts  RouteWindowSync.tsx
-    renderers/FolderWindow.tsx  ProjectWindow.tsx  ExperimentWindow.tsx
-    renderers/AboutWindow.tsx  NotFoundWindow.tsx  renderContent.tsx
-    a11y/LiveAnnouncer.tsx  useRovingGrid.ts
+    grid/IconGrid.tsx                 DesktopGrid, FolderIconGrid
+    grid/FolderShortcut.tsx  FileShortcut.tsx
+    grid/GridComponents/IconTile.tsx
+    taskbar/Taskbar.tsx
+    taskbar/TaskbarComponents/StartButton.tsx  StartMenu.tsx  PinnedLinks.tsx
+    taskbar/TaskbarComponents/TaskbarWindowItem.tsx  WindowSwitcher.tsx  TrayClock.tsx
+    taskbar/TaskbarHelpers/taskbarAnchors.ts
+    windows/Window.tsx
+    windows/WindowsComponents/WindowManager.tsx  WindowTitleBar.tsx  WindowControls.tsx
+    windows/WindowsComponents/WindowBody.tsx  NotFoundDocument.tsx  WindowResizeHandle.tsx  WindowErrorBoundary.tsx
+    windows/WindowsHelpers/geometry.ts  presets.ts  useWindowDrag.ts  useWindowResize.ts  useLayoutMode.ts
+    state/WindowProvider.tsx
+    state/StateHelpers/types.ts  windowReducer.ts  selectors.ts  useWindowActions.ts
+    routing/RouteWindowSync.tsx
+    routing/RoutingHelpers/paths.ts
+    a11y/LiveAnnouncer.tsx
+    a11y/A11yHelpers/announce.ts  useRovingGrid.ts
+    theme/ThemeProvider.tsx
+    theme/ThemeHelpers/theme.ts
     motion.ts                     durations, easings, variants
   content/
-    types.ts  site.ts  folders.ts  projects.ts  experiments.ts  profile.ts  links.ts
-    startMenu.ts  registry.ts
+    catalog.ts  site.ts  desktop.tsx  FolderChrome.tsx  ShellGlyph.tsx
+    about/AboutMeFolder.tsx  ProfileFile.tsx  ExperienceFile.tsx  SkillsFile.tsx  ContactFile.tsx
+    projects/ProjectsFolder.tsx  CatalogStorefrontFile.tsx  OperationsDeskFile.tsx
+    experiments/ExperimentsFolder.tsx  LayoutStudyFile.tsx
   icons/FolderIcon.tsx  FileIcon.tsx  brand.tsx  iconMap.ts
   components/                     reused leaf components (below)
   lib/cn.ts
@@ -446,13 +454,12 @@ src/
 ### 4.1 Types
 
 ```ts
-// src/content/types.ts (excerpt)
-export type ContentKind = 'folder' | 'project' | 'experiment' | 'profile' | 'link' | 'system';
-export type ContentKey = `${ContentKind}:${string}`; // 'project:catalog-storefront'
-
-// src/os/state/types.ts
-export type WindowKind = Exclude<ContentKind, 'link'>; // links never open windows
-export type WindowId = `win:${ContentKey}`;
+// src/os/state/StateHelpers/types.ts
+export type ContentId =
+  | `folder:${string}` | `project:${string}` | `experiment:${string}`
+  | `profile:${string}` | `system:${string}`;
+export type PresetName = 'folder' | 'document' | 'profile' | 'dialog';
+export type WindowId = `win:${ContentId}`; // 'win:project:catalog-storefront'
 export type LayoutMode = 'desktop' | 'tablet' | 'mobile';
 
 export interface Bounds {
@@ -469,8 +476,8 @@ export interface Viewport {
 
 export interface WindowInstance {
   id: WindowId;
-  contentKey: ContentKey;
-  kind: WindowKind;
+  contentId: ContentId; // the component; resolved outside the reducer
+  preset: PresetName;    // copied at OPEN so geometry does not import JSX
   minimized: boolean;
   maximized: boolean;
   bounds: Bounds; // last un-maximized desktop bounds
@@ -487,7 +494,7 @@ export interface WindowState {
 }
 
 export type WindowAction =
-  | { type: 'OPEN'; contentKey: ContentKey; viewport: Viewport; originId?: WindowId; meta?: WindowInstance['meta'] }
+  | { type: 'OPEN'; contentId: ContentId; preset: PresetName; viewport: Viewport; originId?: WindowId; meta?: WindowInstance['meta'] }
   | { type: 'FOCUS'; id: WindowId } // also restores if minimized
   | { type: 'MINIMIZE'; id: WindowId }
   | { type: 'CLOSE'; id: WindowId }
@@ -503,11 +510,11 @@ export type WindowAction =
 
 | Value | Canonical or derived | Source |
 | --- | --- | --- |
-| Window identity | Canonical | `id = win:${contentKey}`; deterministic, therefore stable across re-opens and StrictMode double effects. |
-| Content shown | Canonical | `contentKey`. |
-| Title, icon, file name, path | **Derived** | `getContent(contentKey)` and `pathFor(contentKey)`. Never stored in window state, so renaming content can't leave stale titles. |
-| Window kind | Canonical (cached) | Copied from content at open time for cheap preset lookup. |
-| Preset (size rules) | Derived | `presetFor(kind)`. |
+| Window identity | Canonical | `id = win:${contentId}`; deterministic, therefore stable across re-opens and StrictMode double effects. |
+| Content shown | Canonical | `contentId`. The component is resolved from the index outside the reducer. |
+| Title, icon, path | **Derived** | `Component.title`, its glyph, and `pathFor(contentId)`. Never stored as a content record. |
+| Preset name | Canonical (cached) | Copied from the component at open time so geometry stays pure. |
+| Preset (size rules) | Derived | `presetFor(preset)`. |
 | Visible or minimized | Canonical | `minimized`. |
 | Active window | Canonical, single value | `activeId`. `isActive = id === activeId`. No per-window `isActive` booleans. |
 | Invariant | | `activeId` is `null` or the ID of a **non-minimized** window. |
@@ -560,9 +567,9 @@ There is no separate `RESTORE` action: restoring is `FOCUS` on a minimized windo
 
 ### 4.5 Instance policy
 
-- **One instance per content key, always.** `OPEN` of an existing key focuses or restores it. This covers folders, projects, experiments, profile sections and the not-found window. Multiple instances of the same document have no use case in a portfolio and would make the URL ambiguous.
+- **One instance per content id, always.** `OPEN` of an existing id focuses or restores it. This covers folders, projects, experiments, profile files and the not-found window. Multiple instances of the same document have no use case in a portfolio and would make the URL ambiguous.
 - `system:not-found` is also single-instance. Opening it again with a different `requestedPath` updates `meta` and focuses it.
-- **Links** (`kind: 'link'`) never create windows. They render as real `<a target="_blank" rel="noopener noreferrer">` elements.
+- **External links** never create windows. They render as real `<a target="_blank" rel="noopener noreferrer">` elements, using URLs from `site.ts`.
 
 ### 4.6 What survives what
 
@@ -584,7 +591,7 @@ There is no separate `RESTORE` action: restoring is `FOCUS` on a minimized windo
 | URL | Resolves to | Notes |
 | --- | --- | --- |
 | `/` | `{ type: 'desktop' }` | Desktop with no focused window. |
-| `/folder/:folderSlug` | `folder:<slug>` | `about`, `projects`, `experiments`, and any future folder. |
+| `/folder/:folderSlug` | `folder:<slug>` | `about`, `projects`, `experiments`. |
 | `/projects/:slug` | `project:<slug>` | Matches the existing site's URLs, so old links keep working. |
 | `/experiments/:slug` | `experiment:<slug>` | |
 | `/about/:slug` | `profile:<slug>` | `profile`, `experience`, `skills`, `contact`. |
@@ -608,17 +615,17 @@ export const router = createBrowserRouter([
 One splat route renders `DesktopEnvironment` for every content URL. Because it's the same route match for all of them, navigation between content URLs **never unmounts the desktop or its windows**. Static redirect routes outrank the splat, and the loaders redirect before anything renders. Path parsing is a pure function built on React Router's `matchPath`:
 
 ```ts
-// src/os/routing/paths.ts
+// src/os/routing/RoutingHelpers/paths.ts
 export type RouteTarget =
   | { type: 'desktop' }
-  | { type: 'content'; contentKey: ContentKey }
+  | { type: 'content'; contentId: ContentId }
   | { type: 'not-found'; requestedPath: string };
 
 export function resolvePath(pathname: string): RouteTarget;
-export function pathFor(contentKey: ContentKey): string | null; // null for 'system:*' and links
+export function pathFor(contentId: ContentId): string | null; // null for system:not-found
 ```
 
-`resolvePath` returns `content` only if the registry actually contains the key; otherwise it returns `not-found`.
+`resolvePath` returns `content` only when a component registered that path; otherwise it returns `not-found`.
 
 ### 5.2 What is in the URL, and what isn't
 
@@ -636,8 +643,8 @@ Each UI-facing action dispatches to the reducer and then, if needed, navigates. 
 
 | Action creator | Dispatch | Navigation |
 | --- | --- | --- |
-| `openContent(key, { originId? })`: double-click or Enter on an icon, Start menu item, `ProjectCard` | `OPEN` | **push** `pathFor(key)` |
-| `focusWindow(id)`: pointerdown inside a window, or a taskbar click on an inactive or minimized item | `FOCUS` | **replace** with `pathFor(contentKey)` |
+| `openContent(component, { originId? })`: double-click or Enter on a shortcut, Start menu item, `ProjectCard` | `OPEN` with `contentId` and `preset` | **push** `component.path` |
+| `focusWindow(id)`: pointerdown inside a window, or a taskbar click on an inactive or minimized item | `FOCUS` | **replace** with `pathFor(contentId)` |
 | `minimizeWindow(id)`: control button, or taskbar click on the active item | `MINIMIZE` | If it was active: **replace** with the next active window's path, or `/` |
 | `closeWindow(id)` | `CLOSE` | If `resolvePath(location.pathname)` points at this window's content: **replace** with the next active window's path, or `/`. Otherwise no navigation. |
 | `toggleMaximize`, `move`, `resize` | respective action | none |
@@ -654,8 +661,8 @@ Non-routable windows (`system:not-found`) never cause navigation when focused.
 ```ts
 const target = resolvePath(location.pathname);
 switch (target.type) {
-  case 'content':   dispatch({ type: 'OPEN', contentKey: target.contentKey, viewport: getViewport() }); break;
-  case 'not-found': dispatch({ type: 'OPEN', contentKey: 'system:not-found', viewport: getViewport(), meta: { requestedPath: target.requestedPath } }); break;
+  case 'content':   dispatch({ type: 'OPEN', contentId: target.contentId, preset: opened.preset, viewport: getViewport() }); break;
+  case 'not-found': dispatch({ type: 'OPEN', contentId: 'system:not-found', preset: 'dialog', viewport: getViewport(), meta: { requestedPath: target.requestedPath } }); break;
   case 'desktop':   dispatch({ type: 'SHOW_DESKTOP' }); break;
 }
 ```
@@ -709,7 +716,7 @@ sequenceDiagram
 
 `RouteWindowSync` renders `DocumentMeta` from the **resolved route**, not from `activeId`, so title and canonical always match the address bar:
 
-- Content: `title = "${item.title} — ${site.name}"`, `description = item.summary ?? item.description`.
+- Content: `title = "${component.title} — ${site.name}"`, `description = component.summary ?? site.description`.
 - Desktop: `title = "${site.name} — ${site.role}"`, `description = site.description`.
 - Not found: `title = "File not found — ${site.name}"`.
 
@@ -719,200 +726,91 @@ The README's static-host SPA fallback remains required and sufficient: every rou
 
 ## 6. Content data model
 
-### 6.1 Types
+The desktop, each folder, and each file are components composed by children. There is no `getChildren` and no `ContentItem.parent` tree. Copy (paragraphs, technologies, experience, skills) lives in the file component's JSX. `site.ts` stays: name, role, URLs, `siteUrl`. External links are URL data, not windows.
+
+### 6.1 What a component declares
+
+The shell cannot read those facts from JSX, so each openable component declares them on the function:
 
 ```ts
-// src/content/types.ts
-export type IconId =
-  | 'folder-about' | 'folder-projects' | 'folder-experiments'
-  | 'file-project' | 'file-experiment' | 'file-profile' | 'file-missing'
-  | 'brand-github' | 'brand-linkedin' | 'brand-instagram';
-
-export type ParentId = 'desktop' | `folder:${string}`;
-
-export interface ImageAsset {
-  src: string; // '/projects/catalog-storefront/cover.avif'
-  alt: string;
-  width: number; // intrinsic px; required to prevent layout shift
-  height: number;
-}
-
-interface BaseContent<K extends ContentKind> {
-  kind: K;
-  slug: string; // unique within kind; also the URL segment
-  title: string; // human title: icon label, window title, taskbar
-  fileName?: string; // developer flavour shown in mono: 'readme.md'
-  summary?: string; // one-liner for tooltips, meta description, cards
-  icon: IconId;
-  parent: ParentId; // where it appears; folder contents are derived from this
-  order?: number; // ascending; ties fall back to title
-}
-
-export interface FolderItem extends BaseContent<'folder'> {
-  accent: 'about' | 'projects' | 'experiments';
-  emptyText: string; // shown when the folder has no children
-}
-
-export type ProjectStatus = 'live' | 'in-progress' | 'archived';
-
-export interface ProjectItem extends BaseContent<'project'> {
-  origin: 'client' | 'personal';
-  category: 'E-commerce' | 'Web application' | 'Website';
-  description: string; // paragraphs separated by a blank line (existing convention)
-  technologies: readonly string[];
-  year?: number;
-  status?: ProjectStatus;
-  role?: string; // 'Frontend lead', 'Solo build'
-  featured?: boolean; // About Me "Selected work"
-  cover?: ImageAsset;
-  gallery?: readonly ImageAsset[];
-  liveUrl?: string;
-  repositoryUrl?: string;
-}
-
-export interface ExperimentItem extends BaseContent<'experiment'> {
-  description: string;
-  technologies: readonly string[];
-  year?: number;
-  status?: 'in-progress' | 'archived';
-  cover?: ImageAsset;
-  repositoryUrl?: string;
-  demo?: () => Promise<{ default: React.ComponentType }>; // lazy, mounted on "Run"
-}
-
-export interface ProfileItem extends BaseContent<'profile'> {
-  section: 'profile' | 'experience' | 'skills' | 'contact';
-}
-
-export interface LinkItem extends BaseContent<'link'> {
-  href: string; // from site.ts
-}
-
-export interface SystemItem extends BaseContent<'system'> {}
-
-export type ContentItem =
-  | FolderItem | ProjectItem | ExperimentItem | ProfileItem | LinkItem | SystemItem;
+ProfileFile.id       // 'profile:profile'
+ProfileFile.path     // '/about/profile'
+ProfileFile.title    // 'Profile'
+ProfileFile.preset   // 'profile' | 'folder' | 'document' | 'dialog'
 ```
 
-Content keys are **computed** by the registry as `${kind}:${slug}`; authors never write them. The data for profile sections (experience entries, skill groups, contact lines) lives in `profile.ts` and `site.ts` as typed arrays and is read by `AboutWindow`; the `ProfileItem` is only the file that points at it.
+Folders also carry `emptyText` and a folder glyph (`accent`). Files carry `fileName` when the tile shows one, and a file glyph (`kind`). Projects and experiments may carry `summary` for the document description. Nothing else is a content JSON record.
 
-### 6.2 Example data
+Presets keep the measurements in `WindowsHelpers/presets.ts`: folder → `folder`, project and experiment → `document`, profile → `profile`, not-found → `dialog`.
 
-```ts
-// src/content/folders.ts
-export const folders = [
-  { kind: 'folder', slug: 'about', title: 'About Me', icon: 'folder-about', accent: 'about', parent: 'desktop', order: 1, emptyText: 'Nothing here yet.' },
-  { kind: 'folder', slug: 'projects', title: 'Projects', icon: 'folder-projects', accent: 'projects', parent: 'desktop', order: 2, emptyText: 'Projects are on their way.' },
-  { kind: 'folder', slug: 'experiments', title: 'Experiments', icon: 'folder-experiments', accent: 'experiments', parent: 'desktop', order: 3, emptyText: 'The lab is quiet.' },
-] as const satisfies readonly FolderItem[];
-
-// src/content/projects.ts (migrated from src/data/projects.ts)
-export const projects = [
-  {
-    kind: 'project',
-    slug: 'catalog-storefront',
-    title: 'Catalog storefront',
-    fileName: 'catalog-storefront.site',
-    summary: 'A product listing, product page, and cart sketched as an e-commerce example.',
-    icon: 'file-project',
-    parent: 'folder:projects',
-    origin: 'client',
-    category: 'E-commerce',
-    description: 'Replace this with the story of a real storefront. ...',
-    technologies: ['React', 'Shopify', 'Liquid', 'Tailwind CSS'],
-    status: 'live',
-    featured: true,
-    liveUrl: 'https://example.com',
-    repositoryUrl: 'https://github.com/your-username/catalog-storefront',
-  },
-] as const satisfies readonly ProjectItem[];
-
-// src/content/profile.ts
-export const profileFiles = [
-  { kind: 'profile', slug: 'profile', section: 'profile', title: 'Profile', fileName: 'readme.md', icon: 'file-profile', parent: 'folder:about', order: 1 },
-  { kind: 'profile', slug: 'experience', section: 'experience', title: 'Experience', fileName: 'experience.log', icon: 'file-profile', parent: 'folder:about', order: 2 },
-  { kind: 'profile', slug: 'skills', section: 'skills', title: 'Skills', fileName: 'skills.json', icon: 'file-profile', parent: 'folder:about', order: 3 },
-  { kind: 'profile', slug: 'contact', section: 'contact', title: 'Contact', fileName: 'contact.vcf', icon: 'file-profile', parent: 'folder:about', order: 4 },
-] as const satisfies readonly ProfileItem[];
-
-// src/content/links.ts (URLs come from site.ts, the single configuration point)
-export const links = [
-  { kind: 'link', slug: 'github', title: 'GitHub', icon: 'brand-github', href: site.githubUrl, parent: 'desktop' },
-  { kind: 'link', slug: 'linkedin', title: 'LinkedIn', icon: 'brand-linkedin', href: site.linkedinUrl, parent: 'desktop' },
-  { kind: 'link', slug: 'instagram', title: 'Instagram', icon: 'brand-instagram', href: site.instagramUrl, parent: 'desktop' },
-] as const satisfies readonly LinkItem[];
-```
-
-`DesktopIcons` shows items with `parent: 'desktop'` **except** links (links appear in the taskbar and Start menu). This keeps the desktop to the three folders while leaving room for future desktop shortcuts: set a different `parent` or add a non-link item.
-
-```ts
-// src/content/startMenu.ts
-export const startMenu = [
-  { label: 'Places', items: ['folder:about', 'folder:projects', 'folder:experiments'] },
-  { label: 'Elsewhere', items: ['link:github', 'link:linkedin', 'link:instagram'] },
-] as const satisfies readonly { label: string; items: readonly ContentKey[] }[];
-```
-
-### 6.3 Registry
-
-```ts
-// src/content/registry.ts
-export function keyOf(item: ContentItem): ContentKey; // `${kind}:${slug}`
-export function getContent(key: ContentKey): ContentItem | undefined;
-export function getChildren(parent: ParentId): readonly ContentItem[]; // sorted by order, then title
-export function getFeaturedProjects(): readonly ProjectItem[];
-```
-
-- The registry builds one `Map<ContentKey, ContentItem>` and one `Map<ParentId, ContentItem[]>` at module load time from the arrays above. Lookups are O(1).
-- In `import.meta.env.DEV` it asserts that keys are unique, that every `parent` folder exists, that every Start menu key exists, and that `cover`/`gallery` images declare dimensions. Violations throw with a readable message.
-- **Adding a project means appending one object to `projects.ts`.** Nothing in `os/` changes.
-- **Adding a folder** means appending to `folders.ts` and giving it an `IconId` (and a folder accent if new). Children show up when they set `parent: 'folder:<slug>'`.
-
-### 6.4 Content kind → renderer
-
-A plain exhaustive `switch` is used instead of a dynamic component map. It's the most readable option, and TypeScript narrows `item` per case and flags a missing case.
+### 6.2 The tree the author writes
 
 ```tsx
-// src/os/renderers/renderContent.tsx
-const ProjectWindow = lazy(() => import('./ProjectWindow.tsx'));
-const ExperimentWindow = lazy(() => import('./ExperimentWindow.tsx'));
-const AboutWindow = lazy(() => import('./AboutWindow.tsx'));
+<DesktopGrid ariaLabel="Desktop">
+  <FolderShortcut folder={AboutMeFolder} />
+  <FolderShortcut folder={ProjectsFolder} />
+  <FolderShortcut folder={ExperimentsFolder} />
+</DesktopGrid>
 
-export function renderContent(item: Exclude<ContentItem, LinkItem>, ctx: RendererContext) {
-  switch (item.kind) {
-    case 'folder': return <FolderWindow item={item} {...ctx} />;      // eager: first thing users open
-    case 'project': return <ProjectWindow item={item} {...ctx} />;
-    case 'experiment': return <ExperimentWindow item={item} {...ctx} />;
-    case 'profile': return <AboutWindow item={item} {...ctx} />;
-    case 'system': return <NotFoundWindow {...ctx} />;                // eager: tiny
-    default: return assertNever(item);
-  }
-}
-
-interface RendererContext {
-  windowId: WindowId;
-  isActive: boolean; // only for presentation tweaks such as the neutral selection ring
-}
+<FolderIconGrid ariaLabel={`${AboutMeFolder.title} contents`}>
+  <FileShortcut file={ProfileFile} />
+  <FileShortcut file={ExperienceFile} />
+  <FileShortcut file={SkillsFile} />
+  <FileShortcut file={ContactFile} />
+</FolderIconGrid>
 ```
 
-Renderers receive the content item and must not read the window manager state. They open other content through `useWindowActions().openContent(key, { originId: windowId })`.
+`ProjectsFolder` and `ExperimentsFolder` list their files the same way. A folder returns one parent (sidebar + grid), not a `Window`. A file returns only the document. `WindowManager` is the only call site of `Window`.
 
----
+`DesktopGrid` and `FolderIconGrid` share selection, `useRovingGrid`, the hint "Press Enter to open.", and `clearSelection`. They do not take `items` and they do not dispatch. The shortcut calls `openContent(component)`. Opening from a folder passes `originId`, so the folder stays open.
+
+The prop that opens is the component. `fileToRender="ProfileFile"` and any name→component map are the registry again, and they are not used. `FolderShortcut` / `FileShortcut` are not `FolderIcon` / `FileIcon`.
+
+### 6.3 Paths
+
+| Component | `id` | `path` | `preset` |
+| --- | --- | --- | --- |
+| About Me | `folder:about` | `/folder/about` | `folder` |
+| Projects | `folder:projects` | `/folder/projects` | `folder` |
+| Experiments | `folder:experiments` | `/folder/experiments` | `folder` |
+| Profile, Experience, Skills, Contact | `profile:profile` (and `experience`, `skills`, `contact`) | `/about/:slug` | `profile` |
+| Each project | `project:<slug>` | `/projects/:slug` | `document` |
+| Each experiment | `experiment:<slug>` | `/experiments/:slug` | `document` |
+| Not found | `system:not-found` | none | `dialog` |
+
+Not-found is a system window for a path that matches no component. It is not a row in the index.
+
+Importing the content modules registers each component by `id` and `path`. `resolvePath` and route sync read that index. The reducer stores `contentId` and the preset name. It does not import JSX. `WindowBody` resolves the component from the index and mounts it. The window id stays deterministic: `win:${contentId}` (ADR-02). The title comes from `Component.title` (ADR-07).
+
+The Start menu and pinned links point at the folder components or at `site.ts` hrefs. The folder sidebar lists the same desktop folders and opens them with `originId`.
+
+### 6.4 Window body
+
+```tsx
+<Window instance ...>
+  <WindowTitleBar title={title}>{title}</WindowTitleBar>
+  <WindowBody documentId={id} instanceId={instance.id} isActive={isActive}>
+    <OpenedDocument documentId={id} windowId={instance.id} />
+  </WindowBody>
+</Window>
+```
+
+`Window` is `memo`-ized. `WindowManager` does not pass a fresh document element into that memo. `WindowBody`'s comparator uses the stable document id, `instance.id`, and `isActive`. `OpenedDocument` is memoized without `isActive`, so focus does not redraw the document. There is no `renderContent` switch (ADR-10).
 
 ## 7. Window sizing, positioning and layering
 
 ### 7.1 Presets
 
-| Preset | Used by kinds | Default (w×h) | Min (w×h) | Max (w×h) | Resizable | Maximizable |
+| Preset | Used by | Default (w×h) | Min (w×h) | Max (w×h) | Resizable | Maximizable |
 | --- | --- | --- | --- | --- | --- | --- |
-| `folder` | `folder` | 720×480 | 400×280 | 1040×760 | yes | yes |
-| `document` | `project`, `experiment` | 880×640 | 480×360 | 1280×(area height) | yes | yes |
-| `profile` | `profile` | 760×600 | 440×360 | 960×880 | yes | yes |
-| `dialog` | `system` | 420×220 | fixed | fixed | no | no |
+| `folder` | folders | 720×480 | 400×280 | 1040×760 | yes | yes |
+| `document` | projects, experiments | 880×640 | 480×360 | 1280×(area height) | yes | yes |
+| `profile` | profile files | 760×600 | 440×360 | 960×880 | yes | yes |
+| `dialog` | not-found | 420×220 | fixed | fixed | no | no |
 
 Every preset is further capped by the desktop area: `width ≤ area.width − 2·GUTTER`, `height ≤ area.height − 2·GUTTER`. Min wins over the area cap only in desktop layout. If the area is smaller than min, the layout mode is no longer `desktop` anyway (§8).
 
-### 7.2 Geometry constants (`src/os/windows/geometry.ts`)
+### 7.2 Geometry constants (`src/os/windows/WindowsHelpers/geometry.ts`)
 
 ```ts
 export const TASKBAR_H = 48;        // 56 below md
@@ -1224,18 +1122,15 @@ The window frame is a plain `div` that owns geometry: inline `transform: transla
 }
 
 @layer base {
-  [data-surface='dark'] {
-    --color-focus: var(--color-rust-300);
-  }
-  /* body, ::selection, reduced-motion rules (existing, updated to semantic tokens) */
+  /* body, ::selection, reduced-motion rules. Light theme remaps live on html[data-theme='light']. */
 }
 ```
 
 Rules:
 
-- Semantic tokens use regular `@theme` (not `@theme inline`), so utilities resolve `var(--color-focus)` at use time and scoped overrides such as `[data-surface='dark']` work.
+- Semantic tokens use regular `@theme` (not `@theme inline`), so utilities resolve `var(--color-focus)` at use time and `html[data-theme='light']` can remap them without touching components.
 - Existing token names (`paper`, `ink`, `muted`, `line`, `accent`, `sand`, `--font-serif`) remain as aliases until the retired pages are deleted, then get removed in the same change.
-- Light and dark aren't themes here; they're **surfaces**. Dark surfaces (desktop, taskbar, menus) and light surfaces (windows) coexist. There is no theme toggle in v1. A future dark-window theme would re-scope semantic tokens under `[data-theme='dark']` without touching components.
+- Dark is the default theme. Light is `data-theme="light"` on `<html>`. Components do not read the theme name for color.
 
 ### 11.2 Naming
 
@@ -1304,16 +1199,16 @@ const tile = {
 | ID | Decision | Rationale |
 | --- | --- | --- |
 | ADR-01 | **`useReducer` + split Context**, no external state library | One small, centralized, pure state machine. The dispatch context is stable, so components that only dispatch never re-render on state changes. |
-| ADR-02 | **Deterministic window IDs** (`win:${contentKey}`) | Enforces single-instance by construction, makes route-driven `OPEN` idempotent, survives StrictMode double effects. |
+| ADR-02 | **Deterministic window IDs** (`win:${contentId}`) | Enforces single-instance by construction, makes route-driven `OPEN` idempotent, survives StrictMode double effects. The id comes from `Component.id`. |
 | ADR-03 | **URL follows focus**; only `openContent` pushes | Shareable, refreshable URLs without the router owning the desktop. Back and forward walk through opened content, not every click. |
 | ADR-04 | **One-way data per direction** (actions navigate; the route effect only dispatches) plus same-reference no-op transitions | Removes feedback loops without a `source` flag or suppression timers. |
 | ADR-05 | **Windows stay mounted while minimized** (`hidden` + `inert`) | Preserves all in-window state for free. Cost is negligible at portfolio scale. |
 | ADR-06 | **Stable DOM order** by `openedAt`; stacking via inline `zIndex` | Moving DOM nodes on focus would reload iframes and video and reset scroll. |
-| ADR-07 | **Title and icon derived from content**, not stored in window state | A single source of truth. |
+| ADR-07 | **Title and icon come from the opened component** (`Component.title` and its glyph), not from a `ContentItem` and not stored as a separate content record | The component the shortcut opened is the source of truth. The reducer stores only `contentId`. |
 | ADR-08 | **No persistence of window layout across reloads** in v1 | Keeps refresh behavior simple and predictable. A future `sessionStorage` snapshot of `WindowState` (minus bounds of not-found windows) can be added in `WindowProvider` without touching components. |
 | ADR-09 | **Custom pointer drag**, not Motion `drag` | Window position must live in the reducer and be clamped. Motion's drag owns its own transform values, which would need constant syncing. |
-| ADR-10 | **Exhaustive `switch` renderer** instead of a dynamic component registry | Readable, type-safe, and adding a kind is one case. |
-| ADR-11 | **Folder contents derived from `parent`** | Adding a project is one object; no folder component lists children by hand. |
+| ADR-10 | **The opened component is mounted directly** | `WindowBody` renders the component the shortcut opened, resolved from the id index. There is no `renderContent` switch and no `kind` case. |
+| ADR-11 | **Folders and the desktop list children in JSX** | `getChildren(parent)` is gone. Adding a file means writing a `FileShortcut` in that folder. |
 | ADR-12 | **`role="dialog"` with `aria-modal="false"`** for windows | Announces each window as a named, self-contained surface without implying modality or trapping focus. |
 | ADR-13 | **No global keyboard shortcuts** | Every viable combination conflicts with browser or OS shortcuts (§9.2). |
 | ADR-14 | **Local brand SVGs** | lucide-react 1.x ships no brand marks. |
@@ -1322,10 +1217,9 @@ const tile = {
 ### 12.2 Rendering and performance
 
 - `Window` is `memo`-ized with props `instance`, `isActive`, `zIndex` and `layoutMode`. The reducer preserves object identity for untouched instances, so focusing one window re-renders two frames (the old and new active), not every window.
-- `WindowBody` is memoized on `contentKey` and receives no geometry, so drag commits and focus changes never re-render content.
+- `WindowBody` is memoized on the document id, `instance.id`, and `isActive`, and receives no geometry, so a drag commit does not re-render the document. `OpenedDocument` ignores `isActive`, so focus does not redraw it either. The document is not created as a child of `Window` inside `WindowManager`'s map.
 - Drag and resize mutate the DOM through refs inside `requestAnimationFrame` and commit once.
-- Heavy renderers (`ProjectWindow`, `ExperimentWindow`, `AboutWindow`) are `React.lazy` chunks. `FolderWindow` and `NotFoundWindow` are eager. Experiment demos load only after the user presses "Run".
-- Each window body has its own `Suspense` boundary (skeleton: three `bg-sunken` bars) and its own `WindowErrorBoundary` (a small class component). A crashing renderer breaks only its own window and offers "Close window".
+- Each window body has its own `Suspense` boundary (skeleton: three `bg-sunken` bars) and its own `WindowErrorBoundary` (a small class component). A crashing document breaks only its own window and offers "Close window".
 - The clock re-renders once a minute, in its own component.
 
 ### 12.3 Images
@@ -1338,28 +1232,27 @@ const tile = {
 
 ### 12.4 TypeScript rules
 
-- Content arrays use `as const satisfies readonly XItem[]` so data is checked but literal types are kept.
-- Actions and content are discriminated unions; every `switch` ends with `assertNever`.
-- `ContentKey` and `WindowId` are template-literal types; no bare `string` IDs cross module boundaries.
-- Reducer, selectors, `paths.ts` and `geometry.ts` are pure modules with no React imports, ready for unit tests when a test runner is introduced. Adding one isn't part of this spec.
+- Openable ids, paths, and presets are declared on the component. `ContentId` and `WindowId` are template-literal types; no bare `string` IDs cross module boundaries.
+- Actions are a discriminated union; every `switch` ends with `assertNever`.
+- The reducer, selectors, and `geometry.ts` are pure modules with no React imports. `paths.ts` reads the component index and does not use hooks. The reducer stores `contentId`; it does not import JSX.
 
 ### 12.5 Extension points
 
 | Future feature | Where it plugs in |
 | --- | --- |
-| Search | A Start menu search field that filters `registry` entries; results call `openContent`. |
-| File previews | An optional `preview` field on content plus a hover/selection preview pane in `FolderWindow`. No window manager change. |
-| More social links | Add to `site.ts`, `links.ts` and `startMenu.ts`, plus a brand SVG. |
-| Project filters | `FolderWindow` toolbar chips filtering `getChildren` by `category` or `origin`; local state, so it survives minimize. |
-| New window type (for example a PDF résumé or a terminal) | Add a `ContentKind`, an item interface, a preset mapping, a renderer case and an optional route pattern in `paths.ts`. |
+| Search | A Start menu field that filters the registered components; results call `openContent`. |
+| File previews | A hover or selection preview beside the folder grid. No window manager change. |
+| More social links | Add the URL to `site.ts` and a row in the taskbar or Start menu, plus a brand SVG. |
+| Project filters | Chips in the projects folder, local state, so they survive minimize. |
+| New document | A new component with `id`, `path`, `title`, and `preset`, listed as a `FileShortcut` where it should appear. |
 | Layout persistence | ADR-08. |
 
 ### 12.6 Build order
 
 1. Tokens, fonts (`index.html`), `cn`, `focus-ring` and `bg-wallpaper` in `index.css`; folder, file and brand icons.
-2. `src/content/*` types, data migration and registry with dev assertions; `paths.ts`.
+2. Content components (`id`, `path`, `title`, `preset`) and the path index; `paths.ts`.
 3. `windowReducer`, selectors, `WindowProvider`, `useWindowActions`.
-4. `DesktopEnvironment`, `DesktopBackground`, `IconGrid` and `IconTile`, `WindowManager`, `Window` chrome (no drag yet), `FolderWindow`.
+4. `DesktopEnvironment`, `DesktopBackground`, `DesktopGrid`, shortcuts, `WindowManager`, `Window` chrome (no drag yet), folder bodies.
 5. `Taskbar`, `TaskbarWindowItem`, `StartButton`, `StartMenu`, `PinnedLinks`, `TrayClock`.
 6. Router switch to the splat route, `RouteWindowSync`, `DocumentMeta` wiring, redirects.
 7. `ProjectWindow`, `AboutWindow`, `ExperimentWindow`, `NotFoundWindow` (lazy), reusing `TechList`, `ProjectGallery`, `ProjectVisual`, `ProjectCard`.
