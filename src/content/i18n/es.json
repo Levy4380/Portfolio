@@ -1,0 +1,199 @@
+{
+  "os": {
+    "places": "Lugares",
+    "elsewhere": "En otro lugar",
+    "appearance": "Apariencia",
+    "language": "Idioma",
+    "english": "English",
+    "spanish": "Español",
+    "start": "Inicio",
+    "taskbar": "Barra de tareas",
+    "menuBar": "Barra de menú",
+    "desktop": "Escritorio",
+    "openWindows": "Ventanas abiertas",
+    "openWindowsCount": "Ventanas abiertas, {count}",
+    "pinnedLinks": "Enlaces fijados",
+    "folders": "Carpetas",
+    "lightTheme": "Tema claro",
+    "darkTheme": "Tema oscuro",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "myGithub": "Mi GitHub",
+    "myLinkedin": "Mi LinkedIn",
+    "contactMe": "Contactame",
+    "instagram": "Instagram",
+    "x": "X",
+    "opensInNewTab": "(se abre en una pestaña nueva)",
+    "item": "elemento",
+    "items": "elementos",
+    "skipToActiveWindow": "Saltar a la ventana activa",
+    "skipToTaskbar": "Saltar a la barra de tareas",
+    "portfolio": "Portafolio",
+    "fileNotFound": "Archivo no encontrado",
+    "window": "Ventana",
+    "close": "Cerrar",
+    "minimize": "Minimizar",
+    "restore": "Restaurar",
+    "maximize": "Maximizar",
+    "minimized": "minimizada",
+    "minimizedTitle": "{title} (minimizada)",
+    "noOpenWindows": "No hay ventanas abiertas.",
+    "stateMinimized": "Minimizada",
+    "stateActive": "Activa",
+    "stateOpen": "Abierta",
+    "closed": "cerrada",
+    "opened": "abierta",
+    "restored": "restaurada",
+    "windowProblem": "Esta ventana tuvo un problema.",
+    "closeWindow": "Cerrar ventana",
+    "contents": "contenido",
+    "pressEnter": "Presioná Enter para abrir.",
+    "loading": "Cargando",
+    "technologies": "Tecnologías",
+    "widget": {
+      "label": "Contacto",
+      "prompt": "¿Querés hablar o cotizar tu proyecto?",
+      "reach": "Contactame a",
+      "action": "Abrir contacto"
+    }
+  },
+  "site": {
+    "role": "Desarrollador full stack",
+    "description": "Portafolio de Tomás Levy, desarrollador full stack. Aplicaciones web, plataformas de gestión, integraciones y storefronts para tu negocio."
+  },
+  "aboutme": {
+    "foldername": "Sobre mí",
+    "empty": "Todavía no hay nada acá.",
+    "profile": {
+      "title": "Perfil",
+      "location": "Buenos Aires, Argentina",
+      "intro": "Soy un desarrollador full stack con años en el mercado. Creo soluciones para tu negocio: aplicaciones web, plataformas de gestión, integraciones y storefronts, con o sin pasarela de pagos.",
+      "body1": "Analizo tu negocio, preparo una propuesta y te entrego un paquete completo, listo para poner en marcha.",
+      "body2": "Trabajo con Linux y aplico automatización con inteligencia artificial a flujos de trabajo.",
+      "selectedWork": "Proyectos destacados",
+      "agencyBefore": "Muchos de mis proyectos fueron bajo el ala de la agencia de ecommerce y B2B",
+      "agencyAfter": "Acá se listan los principales donde me desenvolví.",
+      "allProjects": "Todos los proyectos",
+      "seeMore": "Ver más",
+      "contact": "Contacto"
+    },
+    "experience": {
+      "title": "Experiencia",
+      "tonica": {
+        "eyebrow": "Tónica · Jornada completa · 2022 — actualidad",
+        "role": "Programador full stack",
+        "body": "Trabajo en Tónica desde 2022. En la agencia me desempeño como programador full stack. Entre mis tareas está el desarrollo de themes de Shopify escalables y configurables, y de aplicaciones que extienden las funciones nativas de la plataforma: sistemas de geolocalización para la asignación de sucursales, herramientas de presupuestación y cotización, e implementación de listas de precios diferenciadas. También desarrollo software a medida según las necesidades de cada cliente, como plataformas de ecommerce, sistemas de cotización para aseguradoras como Sancor y SMG, y el mantenimiento de bases de datos y sistemas."
+      },
+      "freelance": {
+        "eyebrow": "Autónomo · 2021 — actualidad",
+        "role": "Desarrollador de software autónomo",
+        "body": "Como desarrollador freelance armo landing pages, sistemas de gestión empresarial a medida —incluido el manejo de caja—, software para sanatorios con gestión de turnos y agendas múltiples, y diseños personalizados."
+      },
+      "education": {
+        "eyebrow": "Universidad Nacional de La Plata · 2018 — 2020",
+        "role": "Ingeniería electrónica",
+        "body": "Ingeniería electrónica en la Universidad Nacional de La Plata, entre 2018 y 2020."
+      }
+    },
+    "skills": {
+      "title": "Habilidades",
+      "heading": "Herramientas del trabajo",
+      "intro": "Agrupadas para que la lista sea fácil de recorrer.",
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "ecommerce": "Comercio electrónico",
+      "other": "Otras"
+    },
+    "contact": {
+      "title": "Contacto",
+      "questions": "¿Tenés un proyecto en mente? ¿Querés modernizar tu flujo de trabajo? ¿Tenés tu negocio o emprendimiento y querés potenciar tus ventas?",
+      "write": "Escribime por LinkedIn o por mail.",
+      "email": "Correo"
+    }
+  },
+  "projects": {
+    "foldername": "Proyectos laborales",
+    "empty": "Los proyectos están en camino.",
+    "visitSite": "Visitar sitio",
+    "caseStudy": "Ficha en Tónica",
+    "atTonica": "En Tónica",
+    "challenge": "El punto de partida",
+    "solution": "Qué se construyó",
+    "results": "Lo publicado",
+    "pekata": {
+      "title": "Pekata Foods",
+      "summary": "Portal donde cada empleado elige su lote navideño mientras Recursos Humanos mantiene control de presupuesto, usuarios y entregas.",
+      "category": "Ecommerce",
+      "imageAlt": "Captura de la tienda Pekata Foods: el titular dice que el lote ideal está a un clic, con una caja de regalo de vino, jamón y quesos.",
+      "challenge": "Pekata vendía lotes corporativos con planillas de empleados, mails y una logística difícil de escalar. Querían que cada empleado eligiera su regalo dentro de un presupuesto definido por la empresa, sin perder el control de RRHH.",
+      "solution": "Una tienda de cara al empleado y un portal de gestión para RRHH. Cada empresa carga su nómina, asigna presupuestos por colaborador, y el empleado elige y configura la entrega. Pekata consolida la operación logística en una sola vista.",
+      "result": "La ficha de Tónica publica tres resultados de la campaña: 3× el volumen procesado, 70% menos de horas de gestión manual de RRHH y 92% de satisfacción de empleados, medida como NPS interno."
+    },
+    "crucijuegos": {
+      "title": "Crucijuegos",
+      "summary": "Portal técnico con catálogo profundo, certificaciones a la vista y presupuestador online para municipios, empresas e instituciones.",
+      "category": "B2B",
+      "imageAlt": "Captura del portal de Crucijuegos, fabricante de juegos de plaza y mobiliario urbano.",
+      "challenge": "Crucijuegos fabrica juegos de plaza, mobiliario urbano, parques acuáticos y juegos inclusivos, y vende a municipios, empresas e instituciones. Los catálogos vivían en PDF y las consultas entraban por mail o teléfono.",
+      "solution": "Un portal con catálogo técnico por categoría, fichas descargables, certificaciones a la vista y un presupuestador que arma la lista de ítems y la envía al equipo comercial. El sitio está publicado en español, inglés, italiano y portugués.",
+      "result": "La ficha de Tónica publica un resultado con número: 4 idiomas en producción (ES, EN, IT, PT)."
+    },
+    "printemps": {
+      "title": "Grupo Printemps",
+      "summary": "Tienda Shopify que ordena 7 divisiones de catálogo bajo una experiencia única, con recompra ágil y la representación oficial Sauleda.",
+      "category": "Ecommerce",
+      "imageAlt": "Captura de la tienda de Grupo Printemps, con el contador de años en el rubro y las divisiones de catálogo.",
+      "challenge": "Grupo Printemps opera desde 1992 con un catálogo de cortinas, toldos, agro, mascotas, piletas, ferretería y esparcimiento. Un catálogo plano no alcanzaba para ordenar 7 divisiones ni para la recompra de clientes frecuentes.",
+      "solution": "Tienda Shopify con theme custom que junta las 7 divisiones, una mecánica Comprá Rápido para reordenar productos conocidos, búsqueda por código y el sello de representación oficial Sauleda.",
+      "result": "La ficha de Tónica publica un resultado con número: 7 divisiones de catálogo en un solo Shopify."
+    },
+    "fiume": {
+      "title": "Fiume Shop",
+      "summary": "Tienda online que junta moda contemporánea, deporte y kits oficiales de clubes argentinos, con drops de temporada y promos como Cyber Fiume.",
+      "category": "Ecommerce",
+      "imageAlt": "Captura de Fiume Shop con una camiseta de Godoy Cruz y una fila de escudos de clubes.",
+      "challenge": "Fiume vende moda contemporánea, deporte y kits oficiales de clubes argentinos al mismo público. Cada línea pide su propio lenguaje, drops de temporada y la financiación en cuotas del mercado local.",
+      "solution": "Shopify con theme custom y arquitectura por línea (Moda, Sport y Clubes), financiación local, envíos gratis desde un umbral y un módulo de clubes destacados en la home.",
+      "result": "La ficha de Tónica publica un resultado con número: 3 líneas de catálogo articuladas (Moda, Sport y Clubes)."
+    },
+    "herLighting": {
+      "title": "Her Lighting",
+      "summary": "Catálogo técnico de iluminación arquitectónica, con galería de proyectos y un carrito de cotización en lugar del checkout.",
+      "category": "B2B",
+      "imageAlt": "Captura de Her Lighting, catálogo de iluminación arquitectónica con el titular Pasión por la luz.",
+      "challenge": "En iluminación arquitectónica el especificador no compra online: arma una lista de luminarias y pide presupuesto. Her Lighting necesitaba un catálogo técnico para arquitectos y un pedido de cotización sin fricción.",
+      "solution": "Fichas técnicas con descarga de especificaciones, galería de proyectos y un carrito que no dispara un checkout: arma el pedido de cotización y lo envía al equipo comercial. El sitio está publicado en español e inglés.",
+      "result": "La ficha de Tónica publica un resultado con número: 2 idiomas en producción (ES, EN)."
+    },
+    "robinLamps": {
+      "title": "Robin Lamps",
+      "summary": "Tienda Shopify de iluminación decorativa en Barcelona, con catálogo público y una tienda profesional B2B en español, inglés y francés.",
+      "category": "Ecommerce",
+      "imageAlt": "Captura de la tienda Robin Lamps en la página del producto Bowie.",
+      "challenge": "Robin Lamps, en Barcelona, necesitaba vender al público y a profesionales —arquitectos, interioristas y distribuidores— con precios distintos, varios idiomas y descarga técnica por producto. Antes, los pedidos se mezclaban entre mails y catálogos PDF.",
+      "solution": "Shopify con un theme editorial, Shopify Markets en español, inglés y francés, tienda profesional con precios mayoristas y alta de cuenta con validación manual.",
+      "result": "La ficha de Tónica publica un resultado con número: 3 idiomas en producción (ES, EN, FR)."
+    }
+  },
+  "experiments": {
+    "foldername": "Proyectos Personales",
+    "empty": "El laboratorio está en silencio.",
+    "layout": {
+      "title": "Estudio de layout",
+      "summary": "Una interfaz experimental pequeña, centrada en tipografía, espaciado y movimiento.",
+      "category": "Experimento",
+      "inProgress": "En curso",
+      "body1": "Reemplazá esto con un experimento o un proyecto paralelo. Existe para mostrar un tercer tipo de trabajo: un estudio de frontend que no es una tienda ni una aplicación de negocio.",
+      "body2": "Usá el campo de portada para los cuadros del estudio. Hasta entonces, la ventana muestra un marcador en lugar de una imagen rota."
+    }
+  },
+  "notfound": {
+    "heading": "Archivo no encontrado",
+    "atPath": "No hay nada en",
+    "mismatch": "Esta dirección no coincide con nada del portafolio.",
+    "next": "Abrí la carpeta de proyectos laborales, o volvé al escritorio.",
+    "openProjects": "Abrir Proyectos laborales",
+    "goToDesktop": "Ir al escritorio",
+    "documentTitle": "Archivo no encontrado — {name}"
+  }
+}

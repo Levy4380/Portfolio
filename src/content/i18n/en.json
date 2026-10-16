@@ -1,0 +1,199 @@
+{
+  "os": {
+    "places": "Places",
+    "elsewhere": "Elsewhere",
+    "appearance": "Appearance",
+    "language": "Language",
+    "english": "English",
+    "spanish": "Español",
+    "start": "Start",
+    "taskbar": "Taskbar",
+    "menuBar": "Menu bar",
+    "desktop": "Desktop",
+    "openWindows": "Open windows",
+    "openWindowsCount": "Open windows, {count}",
+    "pinnedLinks": "Pinned links",
+    "folders": "Folders",
+    "lightTheme": "Light theme",
+    "darkTheme": "Dark theme",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "myGithub": "My GitHub",
+    "myLinkedin": "My LinkedIn",
+    "contactMe": "Contact me",
+    "instagram": "Instagram",
+    "x": "X",
+    "opensInNewTab": "(opens in a new tab)",
+    "item": "item",
+    "items": "items",
+    "skipToActiveWindow": "Skip to active window",
+    "skipToTaskbar": "Skip to taskbar",
+    "portfolio": "Portfolio",
+    "fileNotFound": "File not found",
+    "window": "Window",
+    "close": "Close",
+    "minimize": "Minimize",
+    "restore": "Restore",
+    "maximize": "Maximize",
+    "minimized": "minimized",
+    "minimizedTitle": "{title} (minimized)",
+    "noOpenWindows": "No open windows.",
+    "stateMinimized": "Minimized",
+    "stateActive": "Active",
+    "stateOpen": "Open",
+    "closed": "closed",
+    "opened": "opened",
+    "restored": "restored",
+    "windowProblem": "This window ran into a problem.",
+    "closeWindow": "Close window",
+    "contents": "contents",
+    "pressEnter": "Press Enter to open.",
+    "loading": "Loading",
+    "technologies": "Technologies",
+    "widget": {
+      "label": "Contact",
+      "prompt": "Want to talk, or get a quote for your project?",
+      "reach": "Email me at",
+      "action": "Open contact"
+    }
+  },
+  "site": {
+    "role": "Full-Stack Developer",
+    "description": "Portfolio of Tomás Levy, a full-stack developer. Web applications, management platforms, integrations, and storefronts for your business."
+  },
+  "aboutme": {
+    "foldername": "About Me",
+    "empty": "Nothing here yet.",
+    "profile": {
+      "title": "Profile",
+      "location": "Buenos Aires, Argentina",
+      "intro": "I am a full-stack developer with years in the market. I build solutions for your business: web applications, management platforms, integrations, and storefronts, with or without a payment gateway.",
+      "body1": "I look at your business, prepare a proposal, and hand you a complete package, ready to put to work.",
+      "body2": "I work with Linux and apply AI automation to workflows.",
+      "selectedWork": "Featured projects",
+      "agencyBefore": "Many of my projects were under the wing of the ecommerce and B2B agency",
+      "agencyAfter": "The main ones I worked on are listed here.",
+      "allProjects": "All projects",
+      "seeMore": "See more",
+      "contact": "Contact"
+    },
+    "experience": {
+      "title": "Experience",
+      "tonica": {
+        "eyebrow": "Tónica · Full-time · 2022 — present",
+        "role": "Full-stack programmer",
+        "body": "I have worked at Tónica since 2022, where I work as a full-stack programmer. My work includes scalable, configurable Shopify themes and apps that extend the platform’s native features: geolocation systems for assigning the right branch, quoting and budgeting tools, and differentiated price lists. I also build custom software for each client’s needs, including bespoke e-commerce platforms, quoting systems for insurers such as Sancor and SMG, and ongoing database and systems maintenance."
+      },
+      "freelance": {
+        "eyebrow": "Self-employed · 2021 — present",
+        "role": "Independent software developer",
+        "body": "As a freelance developer I build landing pages, custom business-management systems — including cash handling —, appointment and multi-schedule software for clinics, and custom designs."
+      },
+      "education": {
+        "eyebrow": "Universidad Nacional de La Plata · 2018 — 2020",
+        "role": "Electrical and Electronics Engineering",
+        "body": "Electrical and electronics engineering at Universidad Nacional de La Plata, from 2018 to 2020."
+      }
+    },
+    "skills": {
+      "title": "Skills",
+      "heading": "Tools used in the work",
+      "intro": "Grouped so the list stays easy to scan.",
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "ecommerce": "E-commerce",
+      "other": "Other"
+    },
+    "contact": {
+      "title": "Contact",
+      "questions": "Have a project in mind? Want to modernize how you work? Do you have a business or a venture, and want to grow your sales?",
+      "write": "Write me on LinkedIn or by email.",
+      "email": "Email"
+    }
+  },
+  "projects": {
+    "foldername": "Work projects",
+    "empty": "Projects are on their way.",
+    "visitSite": "Visit site",
+    "caseStudy": "Tónica case study",
+    "atTonica": "At Tónica",
+    "challenge": "Starting point",
+    "solution": "What was built",
+    "results": "Published result",
+    "pekata": {
+      "title": "Pekata Foods",
+      "summary": "A portal where each employee chooses a holiday hamper while HR keeps control of budget, users, and deliveries.",
+      "category": "E-commerce",
+      "imageAlt": "Screenshot of the Pekata Foods store: the headline says the ideal hamper is one click away, beside a gift box of wine, ham, and cheese.",
+      "challenge": "Pekata sold corporate hampers through employee spreadsheets, email, and a logistics process that was hard to scale. They wanted each employee to choose a gift inside a budget set by the company, without HR losing control.",
+      "solution": "A storefront for the employee and a management portal for HR. Each client company loads its staff list, assigns a budget per person, and the employee chooses and configures delivery. Pekata sees the logistics operation in one view.",
+      "result": "Tónica's case study publishes three campaign results: 3× the volume processed, 70% fewer hours of manual HR work, and 92% employee satisfaction, measured as an internal NPS."
+    },
+    "crucijuegos": {
+      "title": "Crucijuegos",
+      "summary": "A technical portal with a deep catalog, visible certifications, and an online quoter for municipalities, companies, and institutions.",
+      "category": "B2B",
+      "imageAlt": "Screenshot of the Crucijuegos portal, a manufacturer of playground equipment and street furniture.",
+      "challenge": "Crucijuegos manufactures playground equipment, street furniture, water parks, and inclusive play, and sells to municipalities, companies, and institutions. Catalogs lived in PDFs, and enquiries came in by email or phone.",
+      "solution": "A portal with a technical catalog by category, downloadable spec sheets, certifications in view, and a quoter that builds the item list and sends it to the sales team. The site is published in Spanish, English, Italian, and Portuguese.",
+      "result": "Tónica's case study publishes one numbered result: 4 languages in production (ES, EN, IT, PT)."
+    },
+    "printemps": {
+      "title": "Grupo Printemps",
+      "summary": "A Shopify store that organizes 7 catalog divisions in one experience, with a fast reorder flow and the official Sauleda representation.",
+      "category": "E-commerce",
+      "imageAlt": "Screenshot of the Grupo Printemps store, with the years-in-business counter and the catalog divisions.",
+      "challenge": "Grupo Printemps has operated since 1992 with a catalog of curtains, awnings, agriculture, pets, pools, hardware, and leisure. A flat catalog could not organize 7 divisions or serve frequent customers who reorder.",
+      "solution": "A Shopify store with a custom theme that brings the 7 divisions together, a Comprá Rápido flow for reordering known products, search by product code, and the official Sauleda representation mark.",
+      "result": "Tónica's case study publishes one numbered result: 7 catalog divisions in a single Shopify store."
+    },
+    "fiume": {
+      "title": "Fiume Shop",
+      "summary": "An online store that brings together contemporary fashion, sport, and official Argentine club kits, with seasonal drops and promos such as Cyber Fiume.",
+      "category": "E-commerce",
+      "imageAlt": "Screenshot of Fiume Shop with a Godoy Cruz jersey and a row of club crests.",
+      "challenge": "Fiume sells contemporary fashion, sport, and official Argentine club kits to the same audience. Each line needs its own language, seasonal drops, and the installment payments the local market expects.",
+      "solution": "Shopify with a custom theme and a line-based architecture (Fashion, Sport, and Clubs), local financing, free shipping above a threshold, and a featured-clubs module on the home page.",
+      "result": "Tónica's case study publishes one numbered result: 3 catalog lines brought together (Fashion, Sport, and Clubs)."
+    },
+    "herLighting": {
+      "title": "Her Lighting",
+      "summary": "A technical catalog of architectural lighting, with a project gallery and a quote cart instead of checkout.",
+      "category": "B2B",
+      "imageAlt": "Screenshot of Her Lighting, an architectural lighting catalog with the headline Passion for light.",
+      "challenge": "In architectural lighting the specifier does not buy online: they build a list of luminaires and ask for a quote. Her Lighting needed a technical catalog for architects and a quote request without friction.",
+      "solution": "Technical product pages with spec downloads, a project gallery, and a cart that does not start checkout: it builds the quote request and sends it to the sales team. The site is published in Spanish and English.",
+      "result": "Tónica's case study publishes one numbered result: 2 languages in production (ES, EN)."
+    },
+    "robinLamps": {
+      "title": "Robin Lamps",
+      "summary": "A Shopify store for decorative lighting in Barcelona, with a public catalog and a professional B2B shop in Spanish, English, and French.",
+      "category": "E-commerce",
+      "imageAlt": "Screenshot of the Robin Lamps store on the Bowie product page.",
+      "challenge": "Robin Lamps, in Barcelona, needed to sell to the public and to professionals — architects, interior designers, and distributors — with different prices, several languages, and a technical download per product. Orders used to arrive mixed between email and PDF catalogs.",
+      "solution": "Shopify with an editorial theme, Shopify Markets in Spanish, English, and French, a professional store with wholesale prices, and account signup with manual approval.",
+      "result": "Tónica's case study publishes one numbered result: 3 languages in production (ES, EN, FR)."
+    }
+  },
+  "experiments": {
+    "foldername": "Personal Projects",
+    "empty": "The lab is quiet.",
+    "layout": {
+      "title": "Layout study",
+      "summary": "A small experimental interface focused on type, spacing, and motion.",
+      "category": "Experiment",
+      "inProgress": "In progress",
+      "body1": "Replace this with an experiment or side project. It exists to show a third kind of work: a frontend study that is not a store and not a business application.",
+      "body2": "Use the cover field for frames of the study. Until then, the window shows a placeholder instead of a broken image."
+    }
+  },
+  "notfound": {
+    "heading": "File not found",
+    "atPath": "Nothing lives at",
+    "mismatch": "This address does not match anything in the portfolio.",
+    "next": "Open the work projects folder, or step back to the desktop.",
+    "openProjects": "Open Work projects",
+    "goToDesktop": "Go to desktop",
+    "documentTitle": "File not found — {name}"
+  }
+}
