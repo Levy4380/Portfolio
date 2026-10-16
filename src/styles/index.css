@@ -196,14 +196,6 @@ html[data-theme='light'] {
   }
 }
 
-@utility bg-wallpaper {
-  background-color: var(--color-desktop);
-  background-image: url('/Wallpaper.webp');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-}
-
 @layer base {
   html {
     scroll-behavior: smooth;
