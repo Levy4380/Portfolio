@@ -1,5 +1,5 @@
 export const site = {
-  name: 'Tomás Levy',
+  name: 'Tomas Levy',
   role: 'Full-Stack Developer',
   email: 'contacto@tomaslevy.dev',
   githubUrl: 'https://github.com/Levy4380',
@@ -11,5 +11,5 @@ export const site = {
    */
   siteUrl: '',
   description:
-    'Portfolio of Tomás Levy, a full-stack developer. Web applications, management platforms, integrations, and storefronts for your business.',
+    'Portfolio of Tomas Levy, a full-stack developer. Web applications, management platforms, integrations, and storefronts for your business.',
 } as const;
