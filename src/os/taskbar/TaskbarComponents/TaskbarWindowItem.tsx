@@ -82,10 +82,10 @@ function TaskbarWindowItemComponent({
         className={cn(
           'pointer-events-none absolute bottom-0.5 left-1/2 h-0.5 -translate-x-1/2 rounded-full transition-[width,background-color] duration-120 motion-reduce:transition-none',
           minimized
-            ? 'w-1 bg-indicator-muted'
+            ? 'w-3 bg-indicator-muted'
             : isActive
-              ? 'w-6 bg-accent-on-dark'
-              : 'w-3 bg-indicator',
+              ? 'w-10 bg-accent-on-dark'
+              : 'w-10 bg-indicator',
         )}
       />
     </button>
