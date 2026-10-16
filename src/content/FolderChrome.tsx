@@ -6,6 +6,7 @@ import { useLayoutMode } from '../os/windows/WindowsHelpers/useLayoutMode.ts';
 import type { WindowId } from '../os/state/StateHelpers/types.ts';
 import { useWindowActions } from '../os/state/StateHelpers/useWindowActions.ts';
 import { getDesktopFolders, type Openable } from './catalog.ts';
+import { useLanguage, useTranslation } from './i18n/useTranslation.ts';
 import { ShellGlyph } from './ShellGlyph.tsx';
 
 /**
@@ -22,6 +23,8 @@ export function FolderChrome({
   children: ReactNode;
 }) {
   const { openContent } = useWindowActions();
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
   const layoutMode = useLayoutMode();
   const showSidebar = layoutMode !== 'mobile';
   const places = getDesktopFolders();
@@ -33,16 +36,18 @@ export function FolderChrome({
 
   const listing =
     count === 0 ? (
-      <p className="flex-1 p-6 text-ui text-fg-muted">{folder.emptyText}</p>
+      <p className="flex-1 p-6 text-ui text-fg-muted">
+        {folder.emptyText ? translation(folder.emptyText) : null}
+      </p>
     ) : (
       children
     );
 
   const status = (
     <div className="flex items-center justify-between gap-3 px-3 py-1.5 text-meta text-fg-muted">
-      <p className="min-w-0 truncate font-mono">{`/Desktop/${folder.title}`}</p>
+      <p className="min-w-0 truncate font-mono">{`/${translation('os.desktop')}/${translation(folder.title)}`}</p>
       <p className="shrink-0 tabular-nums">
-        {count} {count === 1 ? 'item' : 'items'}
+        {count} {translation(count === 1 ? 'os.item' : 'os.items')}
       </p>
     </div>
   );
@@ -64,7 +69,7 @@ export function FolderChrome({
     <div className="flex h-full min-h-0 flex-col overflow-hidden bg-window text-fg">
       <div className="flex min-h-0 flex-1 gap-2 p-2">
         <nav
-          aria-label="Folders"
+          aria-label={translation('os.folders')}
           className="flex w-44 shrink-0 flex-col gap-0.5 self-stretch overflow-y-auto rounded-menu bg-sunken p-2"
         >
           {places.map((place) => {
@@ -81,7 +86,7 @@ export function FolderChrome({
                 onClick={() => open(place)}
               >
                 <ShellGlyph icon={place.icon} className="size-4 shrink-0" />
-                <span className="min-w-0 truncate">{place.title}</span>
+                <span className="min-w-0 truncate">{translation(place.title)}</span>
               </button>
             );
           })}

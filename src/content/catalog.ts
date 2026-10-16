@@ -2,6 +2,7 @@ import { createElement, type ReactNode } from 'react';
 
 import type { FileKind } from '../icons/FileIcon.tsx';
 import type { FolderAccent } from '../icons/FolderIcon.tsx';
+import type { TranslationKey } from './i18n/useTranslation.ts';
 import type {
   ContentId,
   PresetName,
@@ -26,23 +27,24 @@ export interface Openable {
   (props: OpenableProps): ReactNode;
   id: ContentId;
   path: string;
-  title: string;
+  /** Catalog key, resolved with `useTranslation` where the title is shown. */
+  title: TranslationKey;
   preset: PresetName;
   icon: ShellIcon;
-  summary?: string;
+  summary?: TranslationKey;
   fileName?: string;
-  emptyText?: string;
+  emptyText?: TranslationKey;
 }
 
 export interface OpenableConfig {
   id: ContentId;
   path: string;
-  title: string;
+  title: TranslationKey;
   preset: PresetName;
   icon: ShellIcon;
-  summary?: string;
+  summary?: TranslationKey;
   fileName?: string;
-  emptyText?: string;
+  emptyText?: TranslationKey;
 }
 
 const byId = new Map<ContentId, Openable>();
@@ -90,9 +92,9 @@ export function renderOpenable(id: ContentId, props: OpenableProps): ReactNode {
   return component ? createElement(component, props) : null;
 }
 
-export function titleFor(id: ContentId): string {
-  if (id === NOT_FOUND_ID) return 'File not found';
-  return byId.get(id)?.title ?? 'Window';
+export function titleFor(id: ContentId): TranslationKey {
+  if (id === NOT_FOUND_ID) return 'os.fileNotFound';
+  return byId.get(id)?.title ?? 'os.window';
 }
 
 export function iconFor(id: ContentId): ShellIcon {

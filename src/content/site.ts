@@ -1,10 +1,9 @@
 export const site = {
-  name: 'Tomas Levy',
-  role: 'Frontend Developer / Web Developer',
-  email: 'contact@tomaslevy.dev',
+  name: 'Tomás Levy',
+  role: 'Full-Stack Developer',
+  email: 'contacto@tomaslevy.dev',
   githubUrl: 'https://github.com/Levy4380',
   linkedinUrl: 'https://www.linkedin.com/in/tomas-levy-9a1368195',
-  instagramUrl: 'https://www.instagram.com/your-profile',
   /**
    * Production origin without a trailing slash, for example "https://example.com".
    * Leave empty until the canonical domain is known. DocumentMeta emits a
@@ -12,6 +11,5 @@ export const site = {
    */
   siteUrl: '',
   description:
-    'Portfolio of a frontend developer working with React, Laravel, Shopify, and e-commerce.',
-  focus: ['React', 'Laravel', 'Shopify', 'E-commerce'],
+    'Portfolio of Tomás Levy, a full-stack developer. Web applications, management platforms, integrations, and storefronts for your business.',
 } as const;

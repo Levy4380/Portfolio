@@ -1,12 +1,14 @@
 import { ProjectCard } from '../../components/projects/ProjectCard.tsx';
 import { ButtonLink } from '../../components/ui/ButtonLink.tsx';
-import { TechList } from '../../components/ui/TechList.tsx';
 import { useWindowActions } from '../../os/state/StateHelpers/useWindowActions.ts';
-import { defineOpenable } from '../catalog.ts';
-import { site } from '../site.ts';
-import { CatalogStorefrontFile } from '../projects/CatalogStorefrontFile.tsx';
-import { OperationsDeskFile } from '../projects/OperationsDeskFile.tsx';
+import type { ContentId } from '../../os/state/StateHelpers/types.ts';
+import { defineOpenable, getOpenable } from '../catalog.ts';
+import { useLanguage, useTranslation } from '../i18n/useTranslation.ts';
+import { featuredProjects } from '../projects/cases.tsx';
 import { ProjectsFolder } from '../projects/ProjectsFolder.tsx';
+import { site } from '../site.ts';
+
+const TONICA_URL = 'https://www.wearetonica.com';
 
 const eyebrow = 'text-meta font-medium tracking-wide text-accent uppercase';
 const subheading = 'text-meta font-medium tracking-wide text-fg-muted uppercase';
@@ -15,72 +17,84 @@ export const ProfileFile = defineOpenable(
   {
     id: 'profile:profile',
     path: '/about/profile',
-    title: 'Profile',
+    title: 'aboutme.profile.title',
     preset: 'profile',
     fileName: 'readme.md',
     icon: { glyph: 'file', kind: 'profile' },
   },
   function ProfileFile({ windowId }) {
     const { openContent } = useWindowActions();
+    const { language } = useLanguage();
+    const translation = useTranslation(language);
+
+    function openRegistered(id: ContentId) {
+      const target = getOpenable(id);
+      if (!target) return;
+      openContent(target, { originId: windowId });
+    }
 
     return (
-      <div className="flex min-h-full flex-col gap-6 bg-window p-6 text-fg">
-        <header className="flex max-w-prose flex-col gap-2">
-          <p className={eyebrow}>{site.role}</p>
-          <h3 className="font-display text-display">{site.name}</h3>
-          <p className="text-heading text-fg-muted">
-            I build interfaces for web applications and online stores, working across React,
-            Laravel, and Shopify.
-          </p>
+      <div className="flex min-h-full flex-col gap-6 bg-window px-6 pt-6 text-fg">
+        <header className="flex flex-col gap-2">
+          <p className={eyebrow}>{translation('site.role')}</p>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <h3 className="text-display font-semibold">{site.name}</h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <ButtonLink variant="secondary" onClick={() => openRegistered('folder:about')}>
+                {translation('aboutme.profile.seeMore')}
+              </ButtonLink>
+              <ButtonLink onClick={() => openRegistered('profile:contact')}>
+                {translation('aboutme.profile.contact')}
+              </ButtonLink>
+            </div>
+          </div>
+          <p className="max-w-prose text-meta text-fg-muted">{translation('aboutme.profile.location')}</p>
+          <p className="max-w-prose text-heading text-fg-muted">{translation('aboutme.profile.intro')}</p>
         </header>
 
         <div className="flex max-w-prose flex-col gap-4">
-          <p className="text-body text-fg-muted">
-            The useful work is usually specific: a checkout edge case, an admin screen people use
-            every day, or a theme change that still has to make sense after the next release.
-          </p>
-          <p className="text-body text-fg-muted">
-            This introduction is a placeholder. Swap it for a short account of the applications
-            you have actually built and maintained.
-          </p>
+          <p className="text-body text-fg-muted">{translation('aboutme.profile.body1')}</p>
+          <p className="text-body text-fg-muted">{translation('aboutme.profile.body2')}</p>
         </div>
 
-        <section className="flex flex-col gap-3" aria-label="Focus">
-          <h4 className={subheading}>Focus</h4>
-          <TechList items={site.focus} />
-        </section>
-
-        <section className="flex flex-col gap-3" aria-label="Selected work">
+        <section className="flex flex-col gap-3" aria-label={translation('aboutme.profile.selectedWork')}>
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <h4 className={subheading}>Selected work</h4>
+            <h4 className={subheading}>{translation('aboutme.profile.selectedWork')}</h4>
             <ButtonLink
               variant="secondary"
               onClick={() => {
                 openContent(ProjectsFolder, { originId: windowId });
               }}
             >
-              All projects
+              {translation('aboutme.profile.allProjects')}
             </ButtonLink>
           </div>
+          <p className="max-w-prose text-body text-fg-muted">
+            {translation('aboutme.profile.agencyBefore')}{' '}
+            <a
+              href={TONICA_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-accent underline decoration-accent/40 underline-offset-2 focus-ring rounded-sm hover:decoration-accent"
+            >
+              wearetonica
+              <span className="sr-only"> {translation('os.opensInNewTab')}</span>
+            </a>
+            . {translation('aboutme.profile.agencyAfter')}
+          </p>
           <ul className="grid gap-4 sm:grid-cols-2">
-            <li>
-              <ProjectCard
-                file={CatalogStorefrontFile}
-                category="E-commerce"
-                summary="A product listing, product page, and cart sketched as an e-commerce example."
-                technologies={['React', 'Shopify', 'Liquid', 'Tailwind CSS']}
-                originId={windowId}
-              />
-            </li>
-            <li>
-              <ProjectCard
-                file={OperationsDeskFile}
-                category="Web application"
-                summary="An internal web application example for everyday operational tasks."
-                technologies={['React', 'TypeScript', 'Laravel']}
-                originId={windowId}
-              />
-            </li>
+            {featuredProjects.map((project) => (
+              <li key={project.config.id}>
+                <ProjectCard
+                  file={project.file}
+                  category={translation(project.config.category)}
+                  summary={translation(project.config.summary)}
+                  technologies={project.config.technologies}
+                  cover={{ ...project.config.cover, alt: translation(project.config.imageAlt) }}
+                  originId={windowId}
+                />
+              </li>
+            ))}
           </ul>
         </section>
       </div>
