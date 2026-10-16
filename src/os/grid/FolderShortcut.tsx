@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 
 import type { Openable } from '../../content/catalog.ts';
+import { useLanguage, useTranslation } from '../../content/i18n/useTranslation.ts';
 import { FolderIcon } from '../../icons/FolderIcon.tsx';
 import { useWindowActions } from '../state/StateHelpers/useWindowActions.ts';
 import { IconTile } from './GridComponents/IconTile.tsx';
@@ -17,6 +18,8 @@ export function FolderShortcut({
   const grid = useIconGrid();
   const originId = useContext(OpenOriginContext);
   const { openContent } = useWindowActions();
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
   const accent = folder.icon.glyph === 'folder' ? folder.icon.accent : 'about';
 
   const open = () => {
@@ -26,7 +29,7 @@ export function FolderShortcut({
   return (
     <IconTile
       id={folder.id}
-      title={folder.title}
+      title={translation(folder.title)}
       icon={<FolderIcon accent={accent} />}
       variant={grid.variant}
       selected={grid.selectedId === folder.id}

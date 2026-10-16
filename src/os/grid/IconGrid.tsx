@@ -2,24 +2,29 @@ import {
   Children,
   cloneElement,
   isValidElement,
-  useCallback,
-  useId,
-  useImperativeHandle,
-  useState,
+  type KeyboardEvent,
   type ReactElement,
   type ReactNode,
   type Ref,
+  type RefObject,
 } from 'react';
 
+import {
+  useLanguage,
+  useTranslation,
+} from '../../content/i18n/useTranslation.ts';
 import { cn } from '../../lib/cn.ts';
-import { useRovingGrid } from '../a11y/A11yHelpers/useRovingGrid.ts';
 import type { IconGridVariant } from '../contracts.ts';
-import { IconGridContext, type IconGridContextValue } from './iconGridContext.tsx';
+import { IconGridBehavior } from './IconGridBehavior.tsx';
+import {
+  IconGridContext,
+  type IconGridContextValue,
+} from './iconGridContext.tsx';
 
 const grid = {
   base: 'grid content-start gap-2',
   desktop:
-    'grid-cols-3 justify-items-center p-4 pt-6 sm:grid-cols-4 md:grid-cols-[repeat(auto-fill,96px)] md:justify-start md:justify-items-start md:pt-4 lg:h-full lg:grid-flow-col lg:grid-cols-none lg:grid-rows-[repeat(auto-fill,120px)]',
+    'grid-cols-3 justify-items-center sm:grid-cols-4 md:grid-cols-[repeat(auto-fill,96px)] md:justify-start md:justify-items-start lg:h-full lg:grid-flow-col lg:grid-cols-none lg:grid-rows-[repeat(auto-fill,var(--os-icon-tile-h))]',
   window: 'grid-cols-[repeat(auto-fill,6rem)] justify-start',
 } as const satisfies Record<'base' | IconGridVariant, string>;
 
@@ -39,59 +44,41 @@ export interface IconGridProps {
   ref?: Ref<IconGridHandle | null>;
 }
 
+interface IconGridShellProps {
+  variant: IconGridVariant;
+  ariaLabel: string;
+  className?: string;
+  children?: ReactNode;
+  value: IconGridContextValue;
+  containerRef: RefObject<HTMLDivElement | null>;
+  onKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
+}
+
 /**
- * Shared selection, roving tabindex, and the "Press Enter to open." hint.
- * Shortcuts are children. The grid does not open anything itself.
+ * Listbox, the "Press Enter to open." hint, and the shortcut context.
+ * Selection and roving tabindex live in IconGridBehavior.
  */
-export function IconGrid({ variant, ariaLabel, className, children, ref }: IconGridProps) {
-  const hintId = useId();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const count = Children.toArray(children).filter(isValidElement).length;
-
-  const selectAt = useCallback((index: number) => {
-    const option = optionAt(index);
-    const id = option?.getAttribute('data-id');
-    if (id) setSelectedId(id);
-  }, []);
-
-  const activateAt = useCallback((index: number) => {
-    optionAt(index)?.click();
-  }, []);
-
-  const { containerRef, activeIndex, setActiveIndex, onKeyDown } = useRovingGrid({
-    count,
-    onMove: selectAt,
-    onSelect: selectAt,
-    onActivate: activateAt,
-  });
-
-  useImperativeHandle(
-    ref,
-    () => ({
-      clearSelection() {
-        setSelectedId(null);
-      },
-    }),
-    [],
-  );
-
-  const value: IconGridContextValue = {
-    variant,
-    hintId,
-    selectedId,
-    activeIndex,
-    select: setSelectedId,
-    focusIndex: setActiveIndex,
-  };
+export function IconGrid({
+  variant,
+  ariaLabel,
+  className,
+  children,
+  value,
+  containerRef,
+  onKeyDown,
+}: IconGridShellProps) {
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
 
   return (
     <IconGridContext.Provider value={value}>
-      <span id={hintId} className="sr-only">
-        Press Enter to open.
+      <span id={value.hintId} className="sr-only">
+        {translation('os.pressEnter')}
       </span>
       <div
         ref={containerRef}
         role="listbox"
+        data-variant={variant}
         aria-label={ariaLabel}
         aria-orientation={variant === 'desktop' ? 'vertical' : undefined}
         className={cn(grid.base, grid[variant], className)}
@@ -103,12 +90,6 @@ export function IconGrid({ variant, ariaLabel, className, children, ref }: IconG
   );
 }
 
-function optionAt(index: number): HTMLElement | undefined {
-  const list = document.activeElement?.closest('[role="listbox"]');
-  const options = list?.querySelectorAll<HTMLElement>('[role="option"]');
-  return options?.[index];
-}
-
 function withIndex(children: ReactNode): ReactNode {
   return Children.map(children, (child, index) => {
     if (!isValidElement<IndexedShortcut>(child)) return child;
@@ -117,9 +98,9 @@ function withIndex(children: ReactNode): ReactNode {
 }
 
 export function DesktopGrid(props: Omit<IconGridProps, 'variant'>) {
-  return <IconGrid variant="desktop" {...props} />;
+  return <IconGridBehavior variant="desktop" {...props} />;
 }
 
 export function FolderIconGrid(props: Omit<IconGridProps, 'variant'>) {
-  return <IconGrid variant="window" {...props} />;
+  return <IconGridBehavior variant="window" {...props} />;
 }

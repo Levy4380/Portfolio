@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 
 import type { Openable } from '../../content/catalog.ts';
+import { useLanguage, useTranslation } from '../../content/i18n/useTranslation.ts';
 import { FileIcon, type FileKind } from '../../icons/FileIcon.tsx';
 import { useWindowActions } from '../state/StateHelpers/useWindowActions.ts';
 import { IconTile } from './GridComponents/IconTile.tsx';
@@ -17,6 +18,8 @@ export function FileShortcut({
   const grid = useIconGrid();
   const originId = useContext(OpenOriginContext);
   const { openContent } = useWindowActions();
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
   const kind: FileKind = file.icon.glyph === 'file' ? file.icon.kind : 'profile';
 
   const open = () => {
@@ -26,7 +29,7 @@ export function FileShortcut({
   return (
     <IconTile
       id={file.id}
-      title={file.title}
+      title={translation(file.title)}
       fileName={file.fileName}
       icon={<FileIcon kind={kind} />}
       variant={grid.variant}

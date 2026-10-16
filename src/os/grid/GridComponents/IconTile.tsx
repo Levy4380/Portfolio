@@ -4,15 +4,15 @@ import { cn } from '../../../lib/cn.ts';
 import type { IconGridVariant } from '../../contracts.ts';
 
 const tile = {
-  base: 'group flex flex-col items-center gap-1 rounded-tile p-2 text-center select-none touch-manipulation focus-ring transition-colors duration-120 active:scale-97 motion-reduce:transform-none aria-selected:ring-1',
+  base: 'group flex h-(--os-icon-tile-h) cursor-pointer flex-col items-center gap-1 rounded-tile p-2 text-center select-none touch-manipulation focus-ring transition-colors duration-120 active:scale-97 motion-reduce:transform-none aria-selected:ring-1 [&>svg]:block',
   desktop:
-    'h-auto min-h-30 w-full max-w-24 md:h-30 md:w-24 text-fg-inverse hover:bg-glass-hover active:bg-glass-active aria-selected:ring-accent-on-dark/60',
+    'w-full max-w-24 md:w-24 text-fg-inverse hover:bg-glass-hover active:bg-glass-active aria-selected:ring-accent-on-dark/60',
   window:
     'w-24 text-fg hover:bg-chrome-hover active:bg-chrome-press aria-selected:bg-selection aria-selected:ring-accent/40 window-inactive:aria-selected:ring-indicator-muted',
 } as const;
 
 const label = {
-  base: 'line-clamp-2 max-w-full shrink-0 break-words text-label',
+  base: 'line-clamp-2 max-h-9 max-w-full shrink-0 hyphens-auto break-words text-label',
   desktop: 'rounded-chip px-1 font-medium group-aria-selected:bg-selection-desktop',
   window: 'font-medium group-aria-selected:font-semibold',
 } as const;
