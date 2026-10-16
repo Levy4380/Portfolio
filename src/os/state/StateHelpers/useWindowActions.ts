@@ -7,20 +7,18 @@ import {
 } from 'react';
 import { useLocation, useNavigate, type NavigateFunction } from 'react-router';
 
-import { NOT_FOUND_ID, type Openable } from '../../../content/catalog.ts';
+import type { Openable } from '../../../content/catalog.ts';
 import type { WindowActions } from '../../contracts.ts';
-import { pathFor, resolvePath } from '../../routing/RoutingHelpers/paths.ts';
+import { pathFor, routePointsAt } from '../../routing/RoutingHelpers/paths.ts';
 import { selectNextActive } from './selectors.ts';
 import type {
-  ContentId,
+  LayoutMode,
   Viewport,
   WindowAction,
   WindowId,
   WindowInstance,
   WindowState,
 } from './types.ts';
-/** Tailwind `lg`. Desktop layout from design.md §8.1. `useLayoutMode` is not written yet. */
-const DESKTOP_LAYOUT_QUERY = '(min-width: 1024px)';
 
 export interface WindowStateSnapshot {
   state: WindowState;
@@ -32,7 +30,10 @@ export interface WindowDispatchApi {
   dispatch: Dispatch<WindowAction>;
   /** Latest reducer state. Does not subscribe the caller to updates. */
   getState: () => WindowState;
+  /** Latest desktop-area viewport from the layout context. */
   readViewport: () => Viewport;
+  /** Latest layout mode from the layout context. */
+  readLayoutMode: () => LayoutMode;
 }
 
 export const WindowStateContext: Context<WindowStateSnapshot | null> =
@@ -68,13 +69,9 @@ export function useWindowDispatch(): Dispatch<WindowAction> {
   return useDispatchApi('useWindowDispatch').dispatch;
 }
 
-/** Stable reader for the desktop-area viewport owned by `WindowProvider`. */
+/** Stable reader for the desktop-area viewport from the layout context. */
 export function useReadViewport(): () => Viewport {
   return useDispatchApi('useReadViewport').readViewport;
-}
-
-function isDesktopLayout(): boolean {
-  return window.matchMedia(DESKTOP_LAYOUT_QUERY).matches;
 }
 
 /** Skip when `target` is null (no URL) or already the address bar. */
@@ -108,29 +105,12 @@ function pathAfterLeaving(state: WindowState, id: WindowId): string | null {
   return pathFor(next.contentId);
 }
 
-/** True when the address bar is this window: a content route, or not-found for `system:not-found`. */
-function routePointsAt(pathname: string, contentId: ContentId): boolean {
-  const target = resolvePath(pathname);
-  switch (target.type) {
-    case 'content':
-      return target.contentId === contentId;
-    case 'not-found':
-      return contentId === NOT_FOUND_ID;
-    case 'desktop':
-      return false;
-    default: {
-      const unreachable: never = target;
-      return unreachable;
-    }
-  }
-}
-
 /**
  * The only UI entry into the window manager. Each method dispatches, then
  * navigates. The route effect later only dispatches, so there is no source flag.
  */
 export function useWindowActions(): WindowActions {
-  const { dispatch, getState, readViewport } =
+  const { dispatch, getState, readViewport, readLayoutMode } =
     useDispatchApi('useWindowActions');
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -170,8 +150,9 @@ export function useWindowActions(): WindowActions {
         replace(navigate, pathname, pathAfterLeaving(state, id));
       },
       toggleMaximize(id) {
-        if (!isDesktopLayout()) return;
-        dispatch({ type: 'TOGGLE_MAXIMIZE', id });
+        if (readLayoutMode() === 'desktop') {
+          dispatch({ type: 'TOGGLE_MAXIMIZE', id });
+        }
       },
       move(id, x, y) {
         dispatch({ type: 'MOVE', id, x, y, viewport: readViewport() });
@@ -183,5 +164,5 @@ export function useWindowActions(): WindowActions {
         dispatch({ type: 'BLUR' });
       },
     };
-  }, [dispatch, getState, navigate, pathname, readViewport]);
+  }, [dispatch, getState, navigate, pathname, readLayoutMode, readViewport]);
 }

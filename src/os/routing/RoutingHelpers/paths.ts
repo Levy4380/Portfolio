@@ -30,3 +30,20 @@ export function pathFor(contentId: ContentId): string | null {
   if (contentId === NOT_FOUND_ID) return null;
   return getOpenable(contentId)?.path ?? null;
 }
+
+/** True when the address bar is this window: a content route, or not-found for `system:not-found`. */
+export function routePointsAt(pathname: string, contentId: ContentId): boolean {
+  const target = resolvePath(pathname);
+  switch (target.type) {
+    case 'content':
+      return target.contentId === contentId;
+    case 'not-found':
+      return contentId === NOT_FOUND_ID;
+    case 'desktop':
+      return false;
+    default: {
+      const unreachable: never = target;
+      return unreachable;
+    }
+  }
+}

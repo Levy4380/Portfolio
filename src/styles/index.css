@@ -2,10 +2,11 @@
 
 @theme {
   /* fonts */
-  --font-sans: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, Inter, ui-sans-serif, system-ui,
+    sans-serif;
   --font-mono:
     'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
-  --font-display: Fraunces, ui-serif, Georgia, serif;
 
   /* raw palette (§2.1) */
   --color-ink-950: #14110e;
@@ -57,10 +58,14 @@
   --color-selection: rgb(251 248 242 / 0.14);
   --color-selection-desktop: rgb(141 61 27 / 0.85);
   --color-taskbar: rgb(28 25 21 / 0.82);
+  --color-menu-solid: var(--color-ink-900);
   --color-chrome-hover: rgb(251 248 242 / 0.08);
   --color-chrome-press: rgb(251 248 242 / 0.16);
   --color-glass-hover: rgb(251 248 242 / 0.1);
   --color-glass-active: rgb(251 248 242 / 0.16);
+  --color-segment-track: rgb(0 0 0 / 0.35);
+  --color-segment: var(--color-ink-500);
+  --color-segment-fg: var(--color-paper-50);
   --color-danger: var(--color-danger-600);
   --color-traffic-close: var(--color-danger-600);
   --color-traffic-minimize: var(--color-amber-600);
@@ -92,21 +97,21 @@
   /* shape (§2.6) */
   --radius-window: 10px;
   --radius-menu: 12px;
+  --radius-widget: 22px;
   --radius-control: 6px;
   --radius-tile: 8px;
   --radius-chip: 4px;
 
   /* elevation (§2.7) */
   --shadow-window:
-    inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(20 17 14 / 0.12),
-    0 8px 24px rgb(20 17 14 / 0.28);
+    0 1px 2px rgb(20 17 14 / 0.12), 0 8px 24px rgb(20 17 14 / 0.28);
   --shadow-window-active:
-    inset 0 1px 0 rgb(255 255 255 / 0.6), 0 1px 2px rgb(20 17 14 / 0.16),
-    0 18px 48px rgb(20 17 14 / 0.45);
+    0 1px 2px rgb(20 17 14 / 0.16), 0 18px 48px rgb(20 17 14 / 0.45);
   --shadow-menu:
     0 12px 32px rgb(0 0 0 / 0.45), 0 0 0 1px rgb(251 248 242 / 0.06);
   --shadow-taskbar:
     0 -1px 0 rgb(251 248 242 / 0.06), 0 -8px 24px rgb(0 0 0 / 0.25);
+  --shadow-segment: 0 1px 2px rgb(0 0 0 / 0.45);
 
   /* layering (§7.8) */
   --z-10: 10;
@@ -127,7 +132,11 @@
 
 :root {
   --os-taskbar-h: 48px;
+  --os-menubar-h: 40px;
   --os-titlebar-h: 40px;
+  /* Icon + two label lines + tile padding. Desktop rows use the same length. */
+  --os-icon-tile-h: 9.5rem;
+  --color-scrollbar: color-mix(in srgb, var(--color-fg-muted) 55%, transparent);
   --wallpaper-glow: rgb(110 47 20 / 0.28);
   --wallpaper-moss: rgb(77 124 79 / 0.12);
   --wallpaper-dot: rgb(251 248 242 / 0.06);
@@ -160,10 +169,14 @@ html[data-theme='light'] {
   --color-selection: rgb(141 61 27 / 0.12);
   --color-selection-desktop: rgb(141 61 27 / 0.14);
   --color-taskbar: rgb(251 248 242 / 0.88);
+  --color-menu-solid: var(--color-paper-50);
   --color-chrome-hover: rgb(28 25 21 / 0.06);
   --color-chrome-press: rgb(28 25 21 / 0.12);
   --color-glass-hover: rgb(28 25 21 / 0.06);
   --color-glass-active: rgb(28 25 21 / 0.1);
+  --color-segment-track: rgb(28 25 21 / 0.1);
+  --color-segment: var(--color-paper-50);
+  --color-segment-fg: var(--color-ink-900);
   --color-traffic-idle: var(--color-ink-500);
   --wallpaper-glow: rgb(141 61 27 / 0.16);
   --wallpaper-moss: rgb(77 124 79 / 0.12);
@@ -176,6 +189,8 @@ html[data-theme='light'] {
     0 12px 32px rgb(20 17 14 / 0.12), 0 0 0 1px rgb(28 25 21 / 0.1);
   --shadow-taskbar:
     0 -1px 0 rgb(28 25 21 / 0.1), 0 -8px 24px rgb(20 17 14 / 0.06);
+  --shadow-segment:
+    0 1px 2px rgb(20 17 14 / 0.18), 0 0 0 1px rgb(28 25 21 / 0.06);
 }
 
 @custom-variant window-inactive (&:where([data-window]:not([data-active]) *));
@@ -190,8 +205,16 @@ html[data-theme='light'] {
 @utility bg-wallpaper {
   background-color: var(--color-desktop);
   background-image:
-    radial-gradient(60rem 40rem at 85% 10%, var(--wallpaper-glow), transparent 70%),
-    radial-gradient(50rem 36rem at 10% 100%, var(--wallpaper-moss), transparent 70%),
+    radial-gradient(
+      60rem 40rem at 85% 10%,
+      var(--wallpaper-glow),
+      transparent 70%
+    ),
+    radial-gradient(
+      50rem 36rem at 10% 100%,
+      var(--wallpaper-moss),
+      transparent 70%
+    ),
     radial-gradient(var(--wallpaper-dot) 1px, transparent 1px);
   background-size:
     auto,
@@ -215,10 +238,75 @@ html[data-theme='light'] {
     background: var(--color-fg);
     color: var(--color-sunken);
   }
+
+  /*
+   * Window scrollbars: thin rounded thumb, no arrows, transparent rail.
+   * Chromium ignores these pseudos when `scrollbar-width` / `scrollbar-color`
+   * are set, and on Linux that standard bar still paints stepper arrows.
+   * Firefox does not understand the pseudos, so it gets the standard pair.
+   */
+  [data-window]::-webkit-scrollbar,
+  [data-window] *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+    background: transparent;
+  }
+
+  [data-window]::-webkit-scrollbar-track,
+  [data-window] *::-webkit-scrollbar-track,
+  [data-window]::-webkit-scrollbar-track-piece,
+  [data-window] *::-webkit-scrollbar-track-piece,
+  [data-window]::-webkit-scrollbar-corner,
+  [data-window] *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  [data-window]::-webkit-scrollbar-thumb,
+  [data-window] *::-webkit-scrollbar-thumb {
+    background-color: var(--color-scrollbar);
+    border-radius: 999px;
+  }
+
+  [data-window]::-webkit-scrollbar-button,
+  [data-window] *::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    [data-window],
+    [data-window] * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--color-scrollbar) transparent;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
+}
+
+/*
+ * Anything that activates on click uses a pointer. Unlayered so it wins over
+ * the preflight button cursor. Drag and resize set their own cursors on the
+ * element; the attribute below locks the gesture cursor for the whole page.
+ */
+button:not(:disabled),
+a[href],
+summary,
+[role='button'],
+[role='menuitem'],
+[role='menuitemradio'],
+[role='option'],
+[role='radio'] {
+  cursor: pointer;
+}
+
+html[data-pointer-cursor],
+html[data-pointer-cursor] * {
+  cursor: var(--pointer-cursor) !important;
 }

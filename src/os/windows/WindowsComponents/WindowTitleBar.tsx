@@ -38,10 +38,11 @@ export function WindowTitleBar({
   return (
     <div
       className={cn(
-        'flex h-12 shrink-0 cursor-default items-center gap-2 px-2.5 select-none md:h-10',
+        'flex h-12 shrink-0 items-center gap-2 px-2.5 select-none md:h-10',
         'transition-colors duration-fast ease-os-out motion-reduce:transition-none',
         isActive ? 'bg-titlebar' : 'bg-titlebar-inactive',
-        layoutMode === 'desktop' && 'touch-none',
+        layoutMode === 'desktop' && !maximized ? 'cursor-grab touch-none' : 'cursor-default',
+        layoutMode === 'desktop' && maximized && 'touch-none',
       )}
       onPointerDown={onPointerDown}
       onDoubleClick={onDoubleClick}

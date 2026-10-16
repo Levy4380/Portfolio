@@ -1,30 +1,31 @@
-import { Check, Sun } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
-import { useEffect, useRef, type KeyboardEvent, type RefObject } from 'react';
+import type { KeyboardEvent, RefObject } from 'react';
 
 import { AboutMeFolder } from '../../../content/about/AboutMeFolder.tsx';
 import type { Openable } from '../../../content/catalog.ts';
 import { ShellGlyph } from '../../../content/ShellGlyph.tsx';
 import { ExperimentsFolder } from '../../../content/experiments/ExperimentsFolder.tsx';
 import { ProjectsFolder } from '../../../content/projects/ProjectsFolder.tsx';
+import { useLanguage, useTranslation } from '../../../content/i18n/useTranslation.ts';
 import { site } from '../../../content/site.ts';
 import { GitHubMark, LinkedInMark } from '../../../icons/brand.tsx';
 import { cn } from '../../../lib/cn.ts';
-import { announce } from '../../a11y/A11yHelpers/announce.ts';
 import { menuPresence } from '../../motion.ts';
 import { useWindowActions } from '../../state/StateHelpers/useWindowActions.ts';
-import { useTheme } from '../../theme/ThemeHelpers/theme.ts';
-import type { StartMenuFocus } from './StartButton.tsx';
 
 export const START_MENU_ID = 'start-menu';
 
-export const menuItemSelector = ':is([role="menuitem"], [role="menuitemcheckbox"])';
+export const menuItemSelector = '[role="menuitem"]';
 
-const places: readonly Openable[] = [AboutMeFolder, ProjectsFolder, ExperimentsFolder];
+const places: readonly Openable[] = [
+  AboutMeFolder,
+  ProjectsFolder,
+  ExperimentsFolder,
+];
 
 const elsewhere = [
-  { title: 'GitHub', href: site.githubUrl, Mark: GitHubMark },
-  { title: 'LinkedIn', href: site.linkedinUrl, Mark: LinkedInMark },
+  { title: 'os.github', href: site.githubUrl, Mark: GitHubMark },
+  { title: 'os.linkedin', href: site.linkedinUrl, Mark: LinkedInMark },
 ] as const;
 
 const itemClass = cn(
@@ -36,122 +37,48 @@ const itemClass = cn(
 export interface StartMenuProps {
   /** Below `md`: full-width bottom sheet instead of the 320px panel. */
   mobile: boolean;
-  /** Which item receives focus on open. */
-  initialFocus: StartMenuFocus;
-  /** Bumps when the Start button asks for the same end again. */
-  focusRequest: number;
-  /** The Start button. Outside clicks on it are its own toggle's business. */
-  triggerRef: RefObject<HTMLElement | null>;
+  menuRef: RefObject<HTMLDivElement | null>;
+  onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
   /** `restoreFocus` returns focus to the Start button. Must be referentially stable. */
   onClose: (restoreFocus: boolean) => void;
 }
 
 export function StartMenu({
   mobile,
-  initialFocus,
-  focusRequest,
-  triggerRef,
+  menuRef,
+  onKeyDown,
   onClose,
 }: StartMenuProps) {
   const { openContent } = useWindowActions();
-  const { theme, toggleTheme } = useTheme();
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
   const reduced = useReducedMotion() ?? false;
-  const menuRef = useRef<HTMLDivElement>(null);
   const motionProps = menuPresence(reduced, mobile);
-  const light = theme === 'light';
-
-  const getItems = () =>
-    Array.from(menuRef.current?.querySelectorAll<HTMLElement>(menuItemSelector) ?? []);
-
-  useEffect(() => {
-    const items = Array.from(
-      menuRef.current?.querySelectorAll<HTMLElement>(menuItemSelector) ?? [],
-    );
-    (initialFocus === 'last' ? items[items.length - 1] : items[0])?.focus();
-  }, [initialFocus, focusRequest]);
-
-  useEffect(() => {
-    const handlePointerDown = (event: PointerEvent) => {
-      const target = event.target as Node;
-      if (menuRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
-      onClose(false);
-    };
-    document.addEventListener('pointerdown', handlePointerDown);
-    return () => document.removeEventListener('pointerdown', handlePointerDown);
-  }, [onClose, triggerRef]);
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const items = getItems();
-    if (items.length === 0) return;
-    const current = items.indexOf(document.activeElement as HTMLElement);
-
-    switch (event.key) {
-      case 'ArrowDown':
-        event.preventDefault();
-        items[(current + 1) % items.length]?.focus();
-        return;
-      case 'ArrowUp':
-        event.preventDefault();
-        items[current <= 0 ? items.length - 1 : current - 1]?.focus();
-        return;
-      case 'Home':
-        event.preventDefault();
-        items[0]?.focus();
-        return;
-      case 'End':
-        event.preventDefault();
-        items[items.length - 1]?.focus();
-        return;
-      case 'Escape':
-        event.preventDefault();
-        onClose(true);
-        return;
-      case 'Tab':
-        triggerRef.current?.focus();
-        onClose(false);
-        return;
-      case ' ':
-        if (event.target instanceof HTMLAnchorElement) {
-          event.preventDefault();
-          event.target.click();
-        }
-        return;
-    }
-
-    if (event.key.length === 1 && /\S/.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) {
-      const letter = event.key.toLowerCase();
-      for (let step = 1; step <= items.length; step += 1) {
-        const candidate = items[(current + step + items.length) % items.length];
-        if (candidate?.textContent?.trim().toLowerCase().startsWith(letter)) {
-          event.preventDefault();
-          candidate.focus();
-          return;
-        }
-      }
-    }
-  };
 
   return (
     <motion.div
       ref={menuRef}
       id={START_MENU_ID}
       role="menu"
-      aria-label="Start"
+      aria-label={translation('os.start')}
       aria-orientation="vertical"
       initial={motionProps.initial}
       animate={motionProps.animate}
       exit={motionProps.exit}
-      onKeyDown={handleKeyDown}
+      onKeyDown={onKeyDown}
       className={cn(
         'fixed z-1100 overflow-y-auto overscroll-contain bg-taskbar p-2 text-fg-inverse shadow-menu backdrop-blur-md',
         mobile
           ? 'inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] max-h-[70dvh] rounded-t-menu'
-          : 'bottom-[calc(3rem+0.5rem)] left-2 w-80 rounded-menu',
+          : 'bottom-[calc(3rem+0.5rem)] left-4 w-80 rounded-menu',
       )}
     >
-      <div role="group" aria-label="Places">
-        <div aria-hidden className="px-3 pb-1 pt-1 text-meta text-fg-inverse-muted">
-          Places
+      <div role="group" aria-label={translation('os.places')}>
+        <div
+          aria-hidden
+          className="px-3 pb-1 pt-1 text-meta text-fg-inverse-muted"
+        >
+          {translation('os.places')}
         </div>
         {places.map((place) => (
           <button
@@ -166,17 +93,20 @@ export function StartMenu({
             }}
           >
             <ShellGlyph icon={place.icon} className="size-5 shrink-0" />
-            <span>{place.title}</span>
+            <span>{translation(place.title)}</span>
           </button>
         ))}
       </div>
       <div
         role="group"
-        aria-label="Elsewhere"
+        aria-label={translation('os.elsewhere')}
         className="mt-2 border-t border-edge-dark pt-2"
       >
-        <div aria-hidden className="px-3 pb-1 pt-1 text-meta text-fg-inverse-muted">
-          Elsewhere
+        <div
+          aria-hidden
+          className="px-3 pb-1 pt-1 text-meta text-fg-inverse-muted"
+        >
+          {translation('os.elsewhere')}
         </div>
         {elsewhere.map((link) => (
           <a
@@ -191,38 +121,11 @@ export function StartMenu({
           >
             <link.Mark className="size-5 shrink-0" />
             <span>
-              {link.title}
-              <span className="sr-only"> (opens in a new tab)</span>
+              {translation(link.title)}
+              <span className="sr-only"> {translation('os.opensInNewTab')}</span>
             </span>
           </a>
         ))}
-      </div>
-      <div
-        role="group"
-        aria-label="Appearance"
-        className="mt-2 border-t border-edge-dark pt-2"
-      >
-        <div aria-hidden className="px-3 pb-1 pt-1 text-meta text-fg-inverse-muted">
-          Appearance
-        </div>
-        <button
-          type="button"
-          role="menuitemcheckbox"
-          aria-checked={light}
-          tabIndex={-1}
-          className={cn(itemClass, 'group aria-checked:bg-glass-active')}
-          onClick={() => {
-            toggleTheme();
-            announce(light ? 'Dark theme' : 'Light theme');
-          }}
-        >
-          <Sun className="size-5 shrink-0" aria-hidden />
-          <span className="min-w-0 flex-1">Light theme</span>
-          <Check
-            className="size-4 shrink-0 opacity-0 group-aria-checked:opacity-100"
-            aria-hidden
-          />
-        </button>
       </div>
     </motion.div>
   );

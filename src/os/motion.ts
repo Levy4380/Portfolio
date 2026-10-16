@@ -126,9 +126,20 @@ export function windowPresence(reduced: boolean): PresenceMotion {
 }
 
 /** `mobileSheet` uses the 24px rise. Close is the same 4px drop either way. */
+const dropPresenceFull: PresenceMotion = {
+  initial: { opacity: 0, y: -6 },
+  animate: { opacity: 1, y: 0, transition: osTransition('base', 'out') },
+  exit: { opacity: 0, y: -4, transition: osTransition('fast', 'in') },
+};
+
 export function menuPresence(reduced: boolean, mobileSheet: boolean): PresenceMotion {
   if (reduced) return reducedPresence;
   return mobileSheet ? menuSheetPresenceFull : menuPresenceFull;
+}
+
+/** Menu that opens downward from the menu bar. */
+export function dropPresence(reduced: boolean): PresenceMotion {
+  return reduced ? reducedPresence : dropPresenceFull;
 }
 
 export function taskbarItemPresence(reduced: boolean): PresenceMotion {

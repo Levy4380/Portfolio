@@ -1,4 +1,5 @@
 import {
+  memo,
   useCallback,
   useMemo,
   useReducer,
@@ -6,9 +7,14 @@ import {
   type ReactNode,
 } from 'react';
 
-import { TASKBAR_H } from '../windows/WindowsHelpers/geometry.ts';
+import { useLayout } from '../windows/WindowsHelpers/useLayoutMode.ts';
 import { selectTaskbarItems } from './StateHelpers/selectors.ts';
-import type { Viewport, WindowAction, WindowState } from './StateHelpers/types.ts';
+import type {
+  LayoutMode,
+  Viewport,
+  WindowAction,
+  WindowState,
+} from './StateHelpers/types.ts';
 import {
   WindowDispatchContext,
   WindowStateContext,
@@ -16,14 +22,6 @@ import {
   type WindowStateSnapshot,
 } from './StateHelpers/useWindowActions.ts';
 import { initialWindowState, windowReducer } from './StateHelpers/windowReducer.ts';
-
-/** Desktop area. geometry.ts has no viewport helper; the taskbar is `TASKBAR_H`. */
-function readViewport(): Viewport {
-  return {
-    width: window.innerWidth,
-    height: window.innerHeight - TASKBAR_H,
-  };
-}
 
 /** `selectTaskbarItems` only reads `windows`, and it allocates a new array every call. */
 function taskbarItemsFor(
@@ -35,8 +33,27 @@ function taskbarItemsFor(
 /**
  * Holds window state. Components that only call actions subscribe to the
  * dispatch context, whose value does not change when state does.
+ * Layout readers come from `LayoutProvider`. The store itself does not
+ * subscribe to viewport changes, so a resize does not re-render the shell.
  */
 export function WindowProvider({ children }: { children: ReactNode }) {
+  const { readViewport, readLayoutMode } = useLayout();
+  return (
+    <WindowStore readLayoutMode={readLayoutMode} readViewport={readViewport}>
+      {children}
+    </WindowStore>
+  );
+}
+
+const WindowStore = memo(function WindowStore({
+  children,
+  readLayoutMode,
+  readViewport,
+}: {
+  children: ReactNode;
+  readLayoutMode: () => LayoutMode;
+  readViewport: () => Viewport;
+}) {
   const [state, rawDispatch] = useReducer(windowReducer, initialWindowState);
   // Event-handler mirror. Action creators read it instead of the state context,
   // so they do not re-render when windows move. Not written during render.
@@ -62,8 +79,8 @@ export function WindowProvider({ children }: { children: ReactNode }) {
   );
 
   const dispatchValue = useMemo<WindowDispatchApi>(
-    () => ({ dispatch, getState, readViewport }),
-    [dispatch, getState],
+    () => ({ dispatch, getState, readViewport, readLayoutMode }),
+    [dispatch, getState, readLayoutMode, readViewport],
   );
 
   return (
@@ -73,4 +90,4 @@ export function WindowProvider({ children }: { children: ReactNode }) {
       </WindowStateContext.Provider>
     </WindowDispatchContext.Provider>
   );
-}
+});

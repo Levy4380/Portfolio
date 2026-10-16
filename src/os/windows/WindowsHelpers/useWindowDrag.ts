@@ -2,50 +2,53 @@ import {
   useEffect,
   useRef,
   type PointerEvent as ReactPointerEvent,
-  type RefObject,
 } from 'react';
 
 import type { Bounds, Viewport } from '../../state/StateHelpers/types.ts';
 import { clampPosition, DRAG_THRESHOLD } from './geometry.ts';
+import { holdCursor } from './pointerCursor.ts';
 
 export interface UseWindowDragOptions {
   /** Desktop layout and not maximized. */
   enabled: boolean;
-  frameRef: RefObject<HTMLElement | null>;
-  /** Set while a gesture owns the frame style, so a render cannot clobber it. */
-  liveBoundsRef: RefObject<Bounds | null>;
   getBounds: () => Bounds;
   getViewport: () => Viewport;
+  onLive: (bounds: Bounds | null) => void;
   onCommit: (x: number, y: number) => void;
 }
 
 /**
  * Title-bar drag. Movement under `DRAG_THRESHOLD` is a click.
- * The frame transform is written in `requestAnimationFrame`; one `MOVE` is
- * committed on pointerup. Escape reverts to the position where the drag began.
+ * Each animation frame calls `onLive`. pointerup and pointercancel commit
+ * one move and clear the live bounds. Escape clears them and does not commit.
  */
 export function useWindowDrag({
   enabled,
-  frameRef,
-  liveBoundsRef,
   getBounds,
   getViewport,
+  onLive,
   onCommit,
 }: UseWindowDragOptions) {
   const enabledRef = useRef(enabled);
   const getBoundsRef = useRef(getBounds);
   const getViewportRef = useRef(getViewport);
+  const onLiveRef = useRef(onLive);
   const onCommitRef = useRef(onCommit);
   const teardownRef = useRef<(() => void) | null>(null);
   const blockDoubleClickRef = useRef(false);
   const dragGenerationRef = useRef(0);
 
-  useEffect(() => {
-    enabledRef.current = enabled;
-    getBoundsRef.current = getBounds;
-    getViewportRef.current = getViewport;
-    onCommitRef.current = onCommit;
-  });
+  // Gesture listeners outlive this render and read these mirrors. Not an effect.
+  // eslint-disable-next-line react-hooks/refs
+  enabledRef.current = enabled;
+  // eslint-disable-next-line react-hooks/refs
+  getBoundsRef.current = getBounds;
+  // eslint-disable-next-line react-hooks/refs
+  getViewportRef.current = getViewport;
+  // eslint-disable-next-line react-hooks/refs
+  onLiveRef.current = onLive;
+  // eslint-disable-next-line react-hooks/refs
+  onCommitRef.current = onCommit;
 
   useEffect(() => {
     return () => {
@@ -69,18 +72,12 @@ export function useWindowDrag({
     let lastY = origin.y;
     let raf = 0;
     let stopped = false;
-
-    const write = (x: number, y: number) => {
-      const next: Bounds = { x, y, width: origin.width, height: origin.height };
-      liveBoundsRef.current = next;
-      const el = frameRef.current;
-      if (!el) return;
-      el.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-    };
+    let releaseCursor = () => {};
 
     const teardown = () => {
       if (stopped) return;
       stopped = true;
+      releaseCursor();
       cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
@@ -89,25 +86,17 @@ export function useWindowDrag({
       document.body.classList.remove('select-none');
       if (handle.hasPointerCapture(pointerId))
         handle.releasePointerCapture(pointerId);
-      liveBoundsRef.current = null;
       if (teardownRef.current === teardown) teardownRef.current = null;
     };
 
     const finish = (commit: boolean) => {
       const didDrag = dragging;
+      const x = lastX;
+      const y = lastY;
       teardown();
       if (!didDrag) return;
-      const el = frameRef.current;
-      if (!commit) {
-        if (el)
-          el.style.transform = `translate3d(${origin.x}px, ${origin.y}px, 0)`;
-        return;
-      }
-      // Flush the last pointer sample. The rAF that would have painted it may
-      // not have run yet, and the live ref must stay clear so React can own
-      // the style after the single MOVE.
-      if (el) el.style.transform = `translate3d(${lastX}px, ${lastY}px, 0)`;
-      onCommitRef.current(lastX, lastY);
+      if (commit) onCommitRef.current(x, y);
+      onLiveRef.current(null);
     };
 
     const onMove = (ev: PointerEvent) => {
@@ -117,6 +106,7 @@ export function useWindowDrag({
       if (!dragging) {
         if (Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
         dragging = true;
+        releaseCursor = holdCursor('grabbing');
         blockDoubleClickRef.current = true;
         const generation = dragGenerationRef.current + 1;
         dragGenerationRef.current = generation;
@@ -140,7 +130,14 @@ export function useWindowDrag({
       lastY = position.y;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        if (!stopped) write(lastX, lastY);
+        if (!stopped) {
+          onLiveRef.current({
+            x: lastX,
+            y: lastY,
+            width: origin.width,
+            height: origin.height,
+          });
+        }
       });
     };
 

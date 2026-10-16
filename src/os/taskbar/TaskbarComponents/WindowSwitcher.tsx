@@ -1,67 +1,50 @@
 import { X } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
-import { useEffect, useRef, type FocusEvent, type KeyboardEvent, type RefObject } from 'react';
+import type { FocusEvent, KeyboardEvent, RefObject } from 'react';
 
 import { iconFor, titleFor } from '../../../content/catalog.ts';
+import { useLanguage, useTranslation } from '../../../content/i18n/useTranslation.ts';
 import { ShellGlyph } from '../../../content/ShellGlyph.tsx';
 import { cn } from '../../../lib/cn.ts';
 import { menuPresence } from '../../motion.ts';
-import type { WindowId, WindowInstance } from '../../state/StateHelpers/types.ts';
+import type {
+  WindowId,
+  WindowInstance,
+} from '../../state/StateHelpers/types.ts';
 
 export const WINDOW_SWITCHER_ID = 'window-switcher';
 
 export interface WindowSwitcherProps {
   items: readonly WindowInstance[];
   activeId: WindowId | null;
-  /** The Windows button. Its own toggle handles clicks on it. */
-  triggerRef: RefObject<HTMLElement | null>;
+  sheetRef: RefObject<HTMLDivElement | null>;
+  onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
+  onBlur: (event: FocusEvent<HTMLDivElement>) => void;
   /** Tap a row: restore and focus. The sheet closes after. */
   onFocusWindow: (id: WindowId) => void;
   onCloseWindow: (id: WindowId) => void;
   /** `restoreFocus` returns focus to the trigger. Must be referentially stable. */
   onClose: (restoreFocus: boolean) => void;
+  /** The row is about to unmount; keep focus inside the sheet. */
+  onFocusSheet: () => void;
 }
 
 /** Bottom sheet listing every window, for mobile. */
 export function WindowSwitcher({
   items,
   activeId,
-  triggerRef,
+  sheetRef,
+  onKeyDown,
+  onBlur,
   onFocusWindow,
   onCloseWindow,
   onClose,
+  onFocusSheet,
 }: WindowSwitcherProps) {
   const reduced = useReducedMotion() ?? false;
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
   const motionProps = menuPresence(reduced, true);
-  const sheetRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const sheet = sheetRef.current;
-    (sheet?.querySelector<HTMLElement>('button') ?? sheet)?.focus();
-  }, []);
-
-  useEffect(() => {
-    const handlePointerDown = (event: PointerEvent) => {
-      const target = event.target as Node;
-      if (sheetRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
-      onClose(false);
-    };
-    document.addEventListener('pointerdown', handlePointerDown);
-    return () => document.removeEventListener('pointerdown', handlePointerDown);
-  }, [onClose, triggerRef]);
-
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== 'Escape') return;
-    event.preventDefault();
-    onClose(true);
-  };
-
-  // Tabbing out of the sheet dismisses it; the trigger keeps its own toggle.
-  const handleBlur = (event: FocusEvent<HTMLDivElement>) => {
-    const next = event.relatedTarget as Node | null;
-    if (!next || sheetRef.current?.contains(next) || triggerRef.current?.contains(next)) return;
-    onClose(false);
-  };
 
   return (
     <motion.div
@@ -69,24 +52,30 @@ export function WindowSwitcher({
       id={WINDOW_SWITCHER_ID}
       role="dialog"
       aria-modal="false"
-      aria-label="Open windows"
+      aria-label={translation('os.openWindows')}
       tabIndex={-1}
       initial={motionProps.initial}
       animate={motionProps.animate}
       exit={motionProps.exit}
-      onKeyDown={handleKeyDown}
-      onBlur={handleBlur}
+      onKeyDown={onKeyDown}
+      onBlur={onBlur}
       className="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-1100 max-h-[70dvh] overflow-y-auto overscroll-contain rounded-t-menu bg-taskbar p-2 text-fg-inverse shadow-menu outline-none backdrop-blur-md"
     >
       {items.length === 0 ? (
-        <p className="px-3 py-4 text-label text-fg-inverse-muted">No open windows.</p>
+        <p className="px-3 py-4 text-label text-fg-inverse-muted">
+          {translation('os.noOpenWindows')}
+        </p>
       ) : (
         <ul className="flex flex-col">
           {items.map((instance) => {
-            const title = titleFor(instance.contentId);
+            const title = translation(titleFor(instance.contentId));
             const icon = iconFor(instance.contentId);
             const isActive = activeId === instance.id && !instance.minimized;
-            const state = instance.minimized ? 'Minimized' : isActive ? 'Active' : 'Open';
+            const state = instance.minimized
+              ? translation('os.stateMinimized')
+              : isActive
+                ? translation('os.stateActive')
+                : translation('os.stateOpen');
 
             return (
               <li
@@ -121,10 +110,10 @@ export function WindowSwitcher({
                 </button>
                 <button
                   type="button"
-                  aria-label={`Close ${title}`}
+                  aria-label={`${translation('os.close')} ${title}`}
                   onClick={() => {
                     // The row is about to unmount; keep focus inside the sheet.
-                    sheetRef.current?.focus();
+                    onFocusSheet();
                     onCloseWindow(instance.id);
                   }}
                   className="grid size-11 shrink-0 place-items-center rounded-control text-fg-inverse touch-manipulation transition-colors duration-120 focus-ring focus-visible:-outline-offset-2 hover:bg-glass-hover active:bg-glass-active"

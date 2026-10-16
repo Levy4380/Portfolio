@@ -1,96 +1,71 @@
 import { Layers } from 'lucide-react';
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useCallback, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import type { RefObject } from 'react';
 
+import { useLanguage, useTranslation } from '../../content/i18n/useTranslation.ts';
 import { cn } from '../../lib/cn.ts';
 import { taskbarItemPresence } from '../motion.ts';
-import { useWindowActions, useWindowState } from '../state/StateHelpers/useWindowActions.ts';
+import type { WindowId, WindowInstance } from '../state/StateHelpers/types.ts';
+import type { TaskbarPanel } from './panelState.ts';
+import {
+  StartButton,
+  type StartMenuFocus,
+} from './TaskbarComponents/StartButton.tsx';
+import { START_MENU_ID } from './TaskbarComponents/StartMenu.tsx';
+import { StartMenuBehavior } from './TaskbarComponents/StartMenuBehavior.tsx';
 import { PinnedLinks } from './TaskbarComponents/PinnedLinks.tsx';
-import { StartButton, type StartMenuFocus } from './TaskbarComponents/StartButton.tsx';
-import { START_MENU_ID, StartMenu } from './TaskbarComponents/StartMenu.tsx';
 import { TaskbarWindowItem } from './TaskbarComponents/TaskbarWindowItem.tsx';
 import { TrayClock } from './TaskbarComponents/TrayClock.tsx';
-import { WINDOW_SWITCHER_ID, WindowSwitcher } from './TaskbarComponents/WindowSwitcher.tsx';
+import { WINDOW_SWITCHER_ID } from './TaskbarComponents/WindowSwitcher.tsx';
+import { WindowSwitcherBehavior } from './TaskbarComponents/WindowSwitcherBehavior.tsx';
 
-/** Below Tailwind's `md` (768px). */
-const MOBILE_QUERY = '(max-width: 767.98px)';
-
-/** One surface at a time. Start and the switcher cannot both be open. */
-type TaskbarPanel =
-  | { kind: 'start'; focus: StartMenuFocus; focusRequest: number }
-  | { kind: 'switcher' };
-
-function subscribeMobile(onChange: () => void) {
-  const query = window.matchMedia(MOBILE_QUERY);
-  query.addEventListener('change', onChange);
-  return () => query.removeEventListener('change', onChange);
+export interface TaskbarProps {
+  /** True when `layoutMode` is mobile. */
+  mobile: boolean;
+  reduced: boolean;
+  panel: TaskbarPanel;
+  taskbarItems: readonly WindowInstance[];
+  activeId: WindowId | null;
+  startRef: RefObject<HTMLButtonElement | null>;
+  windowsRef: RefObject<HTMLButtonElement | null>;
+  onToggleStart: () => void;
+  onOpenStartFromKey: (focus: StartMenuFocus) => void;
+  /** `restoreFocus` returns focus to the Start button. Must be referentially stable. */
+  onCloseStart: (restoreFocus: boolean) => void;
+  onToggleSwitcher: () => void;
+  /** `restoreFocus` returns focus to the Windows button. Must be referentially stable. */
+  onCloseSwitcher: (restoreFocus: boolean) => void;
+  onFocusWindow: (id: WindowId) => void;
+  onMinimizeWindow: (id: WindowId) => void;
+  onCloseWindow: (id: WindowId) => void;
 }
-
-const getMobileSnapshot = () => window.matchMedia(MOBILE_QUERY).matches;
-const getMobileServerSnapshot = () => false;
 
 /**
  * Bottom bar. It owns no window list: items come from `taskbarItems`.
- * Desktop: Start | pinned links | divider | window list | clock.
+ * Desktop: Start | pinned links | divider | window list | clock and date.
  * Mobile: Start | Windows button (count badge) | clock, with the switcher sheet.
  */
-export function Taskbar() {
-  const { state, taskbarItems } = useWindowState();
-  const { focusWindow, minimizeWindow, closeWindow } = useWindowActions();
-  const reduced = useReducedMotion() ?? false;
-  const mobile = useSyncExternalStore(subscribeMobile, getMobileSnapshot, getMobileServerSnapshot);
-
-  const startRef = useRef<HTMLButtonElement>(null);
-  const windowsRef = useRef<HTMLButtonElement>(null);
-  const focusReturn = useRef<HTMLElement | null>(null);
-  const [panel, setPanel] = useState<TaskbarPanel | null>(null);
-  const [trackedMobile, setTrackedMobile] = useState(mobile);
-
-  // The sheet only exists below `md`. Clearing it with the viewport change
-  // means a later resize back down does not reopen it.
-  if (mobile !== trackedMobile) {
-    setTrackedMobile(mobile);
-    if (!mobile && panel?.kind === 'switcher') setPanel(null);
-  }
-
+export function Taskbar({
+  mobile,
+  reduced,
+  panel,
+  taskbarItems,
+  activeId,
+  startRef,
+  windowsRef,
+  onToggleStart,
+  onOpenStartFromKey,
+  onCloseStart,
+  onToggleSwitcher,
+  onCloseSwitcher,
+  onFocusWindow,
+  onMinimizeWindow,
+  onCloseWindow,
+}: TaskbarProps) {
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
   const startOpen = panel?.kind === 'start';
   const switcherOpen = panel?.kind === 'switcher';
-
-  useLayoutEffect(() => {
-    if (panel !== null) return;
-    const node = focusReturn.current;
-    focusReturn.current = null;
-    node?.focus();
-  }, [panel]);
-
-  const closeStart = useCallback((restoreFocus: boolean) => {
-    focusReturn.current = restoreFocus ? startRef.current : null;
-    setPanel((current) => (current?.kind === 'start' ? null : current));
-  }, []);
-
-  const closeSwitcher = useCallback((restoreFocus: boolean) => {
-    focusReturn.current = restoreFocus ? windowsRef.current : null;
-    setPanel((current) => (current?.kind === 'switcher' ? null : current));
-  }, []);
-
-  const toggleStart = () => {
-    setPanel((current) =>
-      current?.kind === 'start' ? null : { kind: 'start', focus: 'first', focusRequest: 0 },
-    );
-  };
-
-  const openStartFromKey = (focus: StartMenuFocus) => {
-    setPanel((current) => ({
-      kind: 'start',
-      focus,
-      focusRequest: current?.kind === 'start' ? current.focusRequest + 1 : 0,
-    }));
-  };
-
-  const toggleSwitcher = () => {
-    setPanel((current) => (current?.kind === 'switcher' ? null : { kind: 'switcher' }));
-  };
-
   const itemMotion = taskbarItemPresence(reduced);
   const count = taskbarItems.length;
 
@@ -99,9 +74,9 @@ export function Taskbar() {
       <nav
         id="taskbar"
         tabIndex={-1}
-        aria-label="Taskbar"
+        aria-label={translation('os.taskbar')}
         className={cn(
-          'fixed inset-x-0 bottom-0 z-1000 flex items-center gap-1 px-2 text-fg-inverse',
+          'fixed inset-x-0 bottom-0 z-1000 flex items-center gap-1 px-8 text-fg-inverse',
           'bg-taskbar shadow-taskbar backdrop-blur-md',
           'h-[calc(3.5rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] md:h-12 md:pb-0',
         )}
@@ -109,8 +84,8 @@ export function Taskbar() {
         <StartButton
           ref={startRef}
           open={startOpen}
-          onToggle={toggleStart}
-          onOpenFrom={openStartFromKey}
+          onToggle={onToggleStart}
+          onOpenFrom={onOpenStartFromKey}
           controlsId={START_MENU_ID}
         />
 
@@ -118,11 +93,11 @@ export function Taskbar() {
           <button
             ref={windowsRef}
             type="button"
-            aria-label={`Open windows, ${count}`}
+            aria-label={translation('os.openWindowsCount', { count })}
             aria-haspopup="dialog"
             aria-expanded={switcherOpen}
             aria-controls={WINDOW_SWITCHER_ID}
-            onClick={toggleSwitcher}
+            onClick={onToggleSwitcher}
             className="relative grid h-11 w-12 shrink-0 place-items-center rounded-control text-fg-inverse select-none touch-manipulation transition-colors duration-120 focus-ring focus-visible:-outline-offset-2 hover:bg-glass-hover active:scale-97 active:bg-glass-active aria-expanded:bg-glass-active motion-reduce:active:scale-100"
           >
             <Layers aria-hidden className="size-5" />
@@ -138,8 +113,14 @@ export function Taskbar() {
         ) : (
           <>
             <PinnedLinks />
-            <span aria-hidden className="mx-1 h-6 shrink-0 border-l border-edge-dark" />
-            <ul aria-label="Open windows" className="flex min-w-0 flex-1 items-center gap-1">
+            <span
+              aria-hidden
+              className="mx-1 h-6 shrink-0 border-l border-edge-dark"
+            />
+            <ul
+              aria-label={translation('os.openWindows')}
+              className="flex min-w-0 flex-1 items-center gap-1"
+            >
               <AnimatePresence initial={false}>
                 {taskbarItems.map((instance) => (
                   <motion.li
@@ -151,10 +132,10 @@ export function Taskbar() {
                   >
                     <TaskbarWindowItem
                       instance={instance}
-                      isActive={state.activeId === instance.id && !instance.minimized}
-                      onFocus={focusWindow}
-                      onMinimize={minimizeWindow}
-                      onClose={closeWindow}
+                      isActive={activeId === instance.id && !instance.minimized}
+                      onFocus={onFocusWindow}
+                      onMinimize={onMinimizeWindow}
+                      onClose={onCloseWindow}
                     />
                   </motion.li>
                 ))}
@@ -170,24 +151,24 @@ export function Taskbar() {
 
       <AnimatePresence>
         {panel?.kind === 'start' ? (
-          <StartMenu
+          <StartMenuBehavior
             key="start-menu"
             mobile={mobile}
             initialFocus={panel.focus}
             focusRequest={panel.focusRequest}
             triggerRef={startRef}
-            onClose={closeStart}
+            onClose={onCloseStart}
           />
         ) : null}
         {panel?.kind === 'switcher' ? (
-          <WindowSwitcher
+          <WindowSwitcherBehavior
             key="window-switcher"
             items={taskbarItems}
-            activeId={state.activeId}
+            activeId={activeId}
             triggerRef={windowsRef}
-            onFocusWindow={focusWindow}
-            onCloseWindow={closeWindow}
-            onClose={closeSwitcher}
+            onFocusWindow={onFocusWindow}
+            onCloseWindow={onCloseWindow}
+            onClose={onCloseSwitcher}
           />
         ) : null}
       </AnimatePresence>

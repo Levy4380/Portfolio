@@ -1,16 +1,8 @@
+import { LayoutGrid } from 'lucide-react';
 import type { KeyboardEvent, Ref } from 'react';
 
-import { site } from '../../../content/site.ts';
+import { useLanguage, useTranslation } from '../../../content/i18n/useTranslation.ts';
 import { cn } from '../../../lib/cn.ts';
-
-/** Owner's initials, at most two letters. */
-const initials =
-  site.name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((word) => word[0]!.toUpperCase())
-    .join('') || '·';
 
 export type StartMenuFocus = 'first' | 'last';
 
@@ -24,8 +16,14 @@ export interface StartButtonProps {
   controlsId: string;
 }
 
-/** 48×40 monogram button. The visible glyph is decorative; "Start" is the accessible name. */
+/**
+ * Apps launcher. A 3×3 grid stands in for the start menu. The control is a
+ * square: 40px from `md`, 44px below. The fill is the taskbar hover plate.
+ */
 export function StartButton({ ref, open, onToggle, onOpenFrom, controlsId }: StartButtonProps) {
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
+
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
     if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
       event.preventDefault();
@@ -43,19 +41,16 @@ export function StartButton({ ref, open, onToggle, onOpenFrom, controlsId }: Sta
       onClick={onToggle}
       onKeyDown={handleKeyDown}
       className={cn(
-        'grid h-10 w-12 shrink-0 place-items-center rounded-control text-fg-inverse select-none touch-manipulation',
-        'transition-colors duration-120 focus-ring focus-visible:-outline-offset-2',
-        'hover:bg-glass-hover active:scale-97 active:bg-glass-active aria-expanded:bg-glass-active',
-        'motion-reduce:active:scale-100 pointer-coarse:h-11',
+        'grid size-10 max-md:size-11 shrink-0 place-items-center rounded-control select-none touch-manipulation cursor-pointer',
+        'bg-glass-hover hover:bg-glass-active active:bg-glass-active aria-expanded:bg-glass-active',
+        'text-fg-inverse',
+        'transition-[transform,background-color] duration-base ease-os-out',
+        'focus-ring focus-visible:-outline-offset-2',
+        'active:scale-97 motion-reduce:active:scale-100 motion-reduce:transition-none',
       )}
     >
-      <span
-        aria-hidden
-        className="grid size-7 place-items-center rounded-control border border-accent-on-dark font-mono text-meta font-semibold leading-none text-accent-on-dark"
-      >
-        {initials}
-      </span>
-      <span className="sr-only">Start</span>
+      <LayoutGrid aria-hidden className="size-7" strokeWidth={1} />
+      <span className="sr-only">{translation('os.start')}</span>
     </button>
   );
 }

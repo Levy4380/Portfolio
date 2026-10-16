@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 
 import { ButtonLink } from '../../../components/ui/ButtonLink.tsx';
+import { useLanguage, useTranslation } from '../../../content/i18n/useTranslation.ts';
 import { ProjectsFolder } from '../../../content/projects/ProjectsFolder.tsx';
 import type { WindowId } from '../../state/StateHelpers/types.ts';
 import { useWindowActions } from '../../state/StateHelpers/useWindowActions.ts';
@@ -14,23 +15,25 @@ export function NotFoundDocument({
 }) {
   const { openContent } = useWindowActions();
   const navigate = useNavigate();
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
 
   return (
-    <div className="flex min-h-full flex-col gap-4 bg-window p-6 text-fg">
-      <h3 className="font-display text-title">File not found</h3>
+    <div className="flex min-h-full flex-col gap-4 bg-window px-6 pt-6 text-fg">
+      <h3 className="text-title font-semibold">{translation('notfound.heading')}</h3>
       <p className="max-w-prose text-body text-fg-muted">
         {requestedPath ? (
           <>
-            Nothing lives at{' '}
+            {translation('notfound.atPath')}{' '}
             <code className="rounded-chip border border-line bg-sunken px-1.5 py-0.5 font-mono text-ui break-all text-fg">
               {requestedPath}
             </code>
             .
           </>
         ) : (
-          'This address does not match anything in the portfolio.'
+          translation('notfound.mismatch')
         )}{' '}
-        Open the projects folder, or step back to the desktop.
+        {translation('notfound.next')}
       </p>
       <div className="flex flex-wrap gap-3">
         <ButtonLink
@@ -38,7 +41,7 @@ export function NotFoundDocument({
             openContent(ProjectsFolder, { originId: windowId });
           }}
         >
-          Open Projects
+          {translation('notfound.openProjects')}
         </ButtonLink>
         <ButtonLink
           variant="secondary"
@@ -46,7 +49,7 @@ export function NotFoundDocument({
             navigate('/');
           }}
         >
-          Go to desktop
+          {translation('notfound.goToDesktop')}
         </ButtonLink>
       </div>
     </div>

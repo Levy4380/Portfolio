@@ -1,6 +1,7 @@
 import { memo, useCallback, type MouseEvent } from 'react';
 
 import { iconFor, titleFor } from '../../../content/catalog.ts';
+import { useLanguage, useTranslation } from '../../../content/i18n/useTranslation.ts';
 import { ShellGlyph } from '../../../content/ShellGlyph.tsx';
 import { cn } from '../../../lib/cn.ts';
 import type { WindowId, WindowInstance } from '../../state/StateHelpers/types.ts';
@@ -28,7 +29,9 @@ function TaskbarWindowItemComponent({
   onClose,
 }: TaskbarWindowItemProps) {
   const { id, minimized } = instance;
-  const title = titleFor(instance.contentId);
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
+  const title = translation(titleFor(instance.contentId));
   const icon = iconFor(instance.contentId);
 
   const setAnchor = useCallback(
@@ -60,7 +63,7 @@ function TaskbarWindowItemComponent({
       type="button"
       aria-pressed={isActive}
       data-minimized={minimized ? '' : undefined}
-      title={minimized ? `${title} (minimized)` : title}
+      title={minimized ? translation('os.minimizedTitle', { title }) : title}
       onClick={handleClick}
       onMouseDown={handleMouseDown}
       onAuxClick={handleAuxClick}
@@ -73,7 +76,7 @@ function TaskbarWindowItemComponent({
     >
       <ShellGlyph icon={icon} className="size-4 shrink-0" />
       <span className={cn('min-w-0 truncate', isActive && 'font-semibold')}>{title}</span>
-      {minimized ? <span className="sr-only">, minimized</span> : null}
+      {minimized ? <span className="sr-only">, {translation('os.minimized')}</span> : null}
       <span
         aria-hidden
         className={cn(

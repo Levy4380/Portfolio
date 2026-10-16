@@ -2,51 +2,58 @@ import {
   useEffect,
   useRef,
   type PointerEvent as ReactPointerEvent,
-  type RefObject,
 } from 'react';
 
 import type { Bounds, Viewport } from '../../state/StateHelpers/types.ts';
-import { clampBounds } from './geometry.ts';
+import { anchoredResize, cursorForResizeEdge, isResizeEdge } from './geometry.ts';
+import { holdCursor } from './pointerCursor.ts';
 import type { WindowPreset } from './presets.ts';
 
 export interface UseWindowResizeOptions {
   /** Desktop layout, resizable preset, not maximized. */
   enabled: boolean;
-  frameRef: RefObject<HTMLElement | null>;
-  liveBoundsRef: RefObject<Bounds | null>;
   getBounds: () => Bounds;
   getViewport: () => Viewport;
   getPreset: () => WindowPreset;
+  onLive: (bounds: Bounds | null) => void;
   onCommit: (bounds: Bounds) => void;
 }
 
 /**
- * Bottom-right resize. Same capture / rAF / single-commit pattern as drag.
- * Escape restores the bounds from pointerdown. pointercancel commits.
+ * Edge and corner resize. The anchor is the side or corner the pointer does
+ * not touch. Same capture / rAF / single-commit pattern as drag. Each
+ * animation frame calls `onLive`. pointerup and pointercancel commit one
+ * resize and clear the live bounds. Escape clears them and does not commit.
  */
 export function useWindowResize({
   enabled,
-  frameRef,
-  liveBoundsRef,
   getBounds,
   getViewport,
   getPreset,
+  onLive,
   onCommit,
 }: UseWindowResizeOptions) {
   const enabledRef = useRef(enabled);
   const getBoundsRef = useRef(getBounds);
   const getViewportRef = useRef(getViewport);
   const getPresetRef = useRef(getPreset);
+  const onLiveRef = useRef(onLive);
   const onCommitRef = useRef(onCommit);
   const teardownRef = useRef<(() => void) | null>(null);
 
-  useEffect(() => {
-    enabledRef.current = enabled;
-    getBoundsRef.current = getBounds;
-    getViewportRef.current = getViewport;
-    getPresetRef.current = getPreset;
-    onCommitRef.current = onCommit;
-  });
+  // Gesture listeners outlive this render and read these mirrors. Not an effect.
+  // eslint-disable-next-line react-hooks/refs
+  enabledRef.current = enabled;
+  // eslint-disable-next-line react-hooks/refs
+  getBoundsRef.current = getBounds;
+  // eslint-disable-next-line react-hooks/refs
+  getViewportRef.current = getViewport;
+  // eslint-disable-next-line react-hooks/refs
+  getPresetRef.current = getPreset;
+  // eslint-disable-next-line react-hooks/refs
+  onLiveRef.current = onLive;
+  // eslint-disable-next-line react-hooks/refs
+  onCommitRef.current = onCommit;
 
   useEffect(() => {
     return () => {
@@ -56,6 +63,8 @@ export function useWindowResize({
 
   const onPointerDown = (event: ReactPointerEvent<HTMLElement>) => {
     if (!enabledRef.current || event.button !== 0) return;
+    const edge = event.currentTarget.dataset.resizeEdge;
+    if (!isResizeEdge(edge)) return;
     event.preventDefault();
 
     const origin = getBoundsRef.current();
@@ -67,19 +76,12 @@ export function useWindowResize({
     let last: Bounds = origin;
     let raf = 0;
     let stopped = false;
-
-    const write = (bounds: Bounds) => {
-      liveBoundsRef.current = bounds;
-      const el = frameRef.current;
-      if (!el) return;
-      el.style.transform = `translate3d(${bounds.x}px, ${bounds.y}px, 0)`;
-      el.style.width = `${bounds.width}px`;
-      el.style.height = `${bounds.height}px`;
-    };
+    const releaseCursor = holdCursor(cursorForResizeEdge(edge));
 
     const teardown = () => {
       if (stopped) return;
       stopped = true;
+      releaseCursor();
       cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', onMove);
       window.removeEventListener('pointerup', onUp);
@@ -88,27 +90,19 @@ export function useWindowResize({
       document.body.classList.remove('select-none');
       if (handle.hasPointerCapture(pointerId))
         handle.releasePointerCapture(pointerId);
-      liveBoundsRef.current = null;
       if (teardownRef.current === teardown) teardownRef.current = null;
     };
 
     const finish = (commit: boolean) => {
       const committed = last;
       teardown();
-      if (!commit) {
-        writeOrigin(frameRef.current, origin);
-        return;
-      }
-      if (
-        committed.x === origin.x &&
-        committed.y === origin.y &&
-        committed.width === origin.width &&
-        committed.height === origin.height
-      ) {
-        return;
-      }
-      writeOrigin(frameRef.current, committed);
-      onCommitRef.current(committed);
+      const changed =
+        committed.x !== origin.x ||
+        committed.y !== origin.y ||
+        committed.width !== origin.width ||
+        committed.height !== origin.height;
+      if (commit && changed) onCommitRef.current(committed);
+      onLiveRef.current(null);
     };
 
     handle.setPointerCapture(pointerId);
@@ -116,20 +110,17 @@ export function useWindowResize({
 
     const onMove = (ev: PointerEvent) => {
       if (stopped || ev.pointerId !== pointerId) return;
-      const next = clampBounds(
-        {
-          x: origin.x,
-          y: origin.y,
-          width: origin.width + (ev.clientX - startClientX),
-          height: origin.height + (ev.clientY - startClientY),
-        },
+      last = anchoredResize(
+        origin,
+        ev.clientX - startClientX,
+        ev.clientY - startClientY,
+        edge,
         getPresetRef.current(),
         getViewportRef.current(),
       );
-      last = next;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        if (!stopped) write(next);
+        if (!stopped) onLiveRef.current(last);
       });
     };
 
@@ -158,11 +149,4 @@ export function useWindowResize({
   };
 
   return { onPointerDown };
-}
-
-function writeOrigin(el: HTMLElement | null, origin: Bounds) {
-  if (!el) return;
-  el.style.transform = `translate3d(${origin.x}px, ${origin.y}px, 0)`;
-  el.style.width = `${origin.width}px`;
-  el.style.height = `${origin.height}px`;
 }

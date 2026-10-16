@@ -1,5 +1,6 @@
 import { Component, type ReactNode } from 'react';
 
+import { useLanguage, useTranslation } from '../../../content/i18n/useTranslation.ts';
 import type { WindowId } from '../../state/StateHelpers/types.ts';
 import { useWindowActions } from '../../state/StateHelpers/useWindowActions.ts';
 
@@ -33,8 +34,7 @@ export class WindowErrorBoundary extends Component<
           className="flex flex-col items-start gap-3 p-4 md:p-6"
           role="alert"
         >
-          <p className="text-body text-fg">This window ran into a problem.</p>
-          <CloseWindowButton windowId={this.props.windowId} />
+          <WindowErrorNotice windowId={this.props.windowId} />
         </div>
       );
     }
@@ -42,16 +42,21 @@ export class WindowErrorBoundary extends Component<
   }
 }
 
-function CloseWindowButton({ windowId }: { windowId: WindowId }) {
+function WindowErrorNotice({ windowId }: { windowId: WindowId }) {
   const { closeWindow } = useWindowActions();
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
 
   return (
-    <button
-      type="button"
-      className="focus-ring rounded-control border border-edge px-3 py-1.5 text-ui font-semibold text-fg hover:bg-chrome-hover active:bg-chrome-press"
-      onClick={() => closeWindow(windowId)}
-    >
-      Close window
-    </button>
+    <>
+      <p className="text-body text-fg">{translation('os.windowProblem')}</p>
+      <button
+        type="button"
+        className="focus-ring rounded-control border border-edge px-3 py-1.5 text-ui font-semibold text-fg hover:bg-chrome-hover active:bg-chrome-press"
+        onClick={() => closeWindow(windowId)}
+      >
+        {translation('os.closeWindow')}
+      </button>
+    </>
   );
 }

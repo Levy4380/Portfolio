@@ -16,8 +16,8 @@ export interface WindowPreset {
 }
 
 const folder: WindowPreset = {
-  defaultWidth: 720,
-  defaultHeight: 480,
+  defaultWidth: 880,
+  defaultHeight: 580,
   minWidth: 400,
   minHeight: 280,
   maxWidth: 1040,
@@ -38,7 +38,7 @@ const documentPreset: WindowPreset = {
 };
 
 const profile: WindowPreset = {
-  defaultWidth: 760,
+  defaultWidth: 880,
   defaultHeight: 600,
   minWidth: 440,
   minHeight: 360,

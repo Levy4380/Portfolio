@@ -1,10 +1,18 @@
 import { Copy, Minus, Square, X } from 'lucide-react';
 
+import { useLanguage, useTranslation } from '../../../content/i18n/useTranslation.ts';
 import { cn } from '../../../lib/cn.ts';
 
-/** Fine pointers sit the discs close together. Coarse pointers keep a 44px hit. */
+/**
+ * The box stays 20px so Close and Minimize stay clustered when Zoom is absent.
+ * Below `md`, and on coarse pointers, a 44px slop covers the tap without
+ * spreading the discs. `gap-2` on those layouts keeps each disc inside its own hit.
+ */
 const hit =
-  'inline-flex size-5 shrink-0 items-center justify-center rounded-full focus-ring focus-visible:-outline-offset-2 pointer-coarse:size-11 max-md:size-11';
+  'relative inline-flex size-5 shrink-0 cursor-pointer items-center justify-center rounded-full focus-ring focus-visible:-outline-offset-2 max-md:before:absolute max-md:before:top-1/2 max-md:before:left-1/2 max-md:before:size-11 max-md:before:-translate-x-1/2 max-md:before:-translate-y-1/2 max-md:before:content-[""] pointer-coarse:before:absolute pointer-coarse:before:top-1/2 pointer-coarse:before:left-1/2 pointer-coarse:before:size-11 pointer-coarse:before:-translate-x-1/2 pointer-coarse:before:-translate-y-1/2 pointer-coarse:before:content-[""]';
+
+const cluster =
+  'group/traffic flex w-max shrink-0 items-center gap-1 max-md:gap-2 pointer-coarse:gap-2';
 
 const disc =
   'flex size-3 items-center justify-center rounded-full transition-colors duration-fast ease-os-out motion-reduce:transition-none';
@@ -31,12 +39,15 @@ export function WindowControls({
   onToggleMaximize,
   onClose,
 }: WindowControlsProps) {
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
+
   return (
-    <div className="group/traffic flex shrink-0 items-center gap-1">
+    <div className={cluster}>
       <button
         type="button"
         className={hit}
-        aria-label={`Close ${title}`}
+        aria-label={`${translation('os.close')} ${title}`}
         onClick={onClose}
       >
         <span
@@ -52,7 +63,8 @@ export function WindowControls({
       <button
         type="button"
         className={hit}
-        aria-label={`Minimize ${title}`}
+        data-control="minimize"
+        aria-label={`${translation('os.minimize')} ${title}`}
         onClick={onMinimize}
       >
         <span
@@ -69,7 +81,7 @@ export function WindowControls({
         <button
           type="button"
           className={hit}
-          aria-label={maximized ? `Restore ${title}` : `Maximize ${title}`}
+          aria-label={`${translation(maximized ? 'os.restore' : 'os.maximize')} ${title}`}
           onClick={onToggleMaximize}
         >
           <span

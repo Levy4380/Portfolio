@@ -1,6 +1,8 @@
 import { memo, Suspense, type ReactNode } from 'react';
 
-import { NOT_FOUND_ID, renderOpenable } from '../../../content/catalog.ts';
+import { iconFor, NOT_FOUND_ID, renderOpenable } from '../../../content/catalog.ts';
+import { FileRenderer } from '../../../content/FileRenderer.tsx';
+import { useLanguage, useTranslation } from '../../../content/i18n/useTranslation.ts';
 import type { ContentId, WindowId } from '../../state/StateHelpers/types.ts';
 import { NotFoundDocument } from './NotFoundDocument.tsx';
 import { WindowErrorBoundary } from './WindowErrorBoundary.tsx';
@@ -55,16 +57,24 @@ export const OpenedDocument = memo(function OpenedDocument({
   windowId: WindowId;
   requestedPath?: string;
 }) {
-  if (documentId === NOT_FOUND_ID) {
-    return <NotFoundDocument windowId={windowId} requestedPath={requestedPath} />;
-  }
-  return renderOpenable(documentId, { windowId });
+  const document =
+    documentId === NOT_FOUND_ID ? (
+      <NotFoundDocument windowId={windowId} requestedPath={requestedPath} />
+    ) : (
+      renderOpenable(documentId, { windowId })
+    );
+
+  if (iconFor(documentId).glyph !== 'file') return document;
+  return <FileRenderer>{document}</FileRenderer>;
 });
 
 function WindowSkeleton() {
+  const { language } = useLanguage();
+  const translation = useTranslation(language);
+
   return (
     <div className="flex flex-col gap-3 p-4 md:p-6" aria-busy="true">
-      <span className="sr-only">Loading</span>
+      <span className="sr-only">{translation('os.loading')}</span>
       <div className="h-4 w-2/3 rounded-chip bg-sunken" />
       <div className="h-4 w-full rounded-chip bg-sunken" />
       <div className="h-4 w-4/5 rounded-chip bg-sunken" />

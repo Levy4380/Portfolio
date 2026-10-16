@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 
+import { useLanguage, type Language } from '../../../content/i18n/useTranslation.ts';
+
 const MINUTE = 60_000;
 
 const pad = (value: number) => String(value).padStart(2, '0');
@@ -11,13 +13,38 @@ function minuteStamp(date: Date): string {
   )}:${pad(date.getMinutes())}`;
 }
 
+function dateFromStamp(stamp: string): Date {
+  const [day, time] = stamp.split('T');
+  const [year, month, date] = day.split('-').map(Number);
+  const [hours, minutes] = time.split(':').map(Number);
+  return new Date(year, month - 1, date, hours, minutes);
+}
+
+function formatClock(stamp: string, language: Language) {
+  const date = dateFromStamp(stamp);
+  const locale = language === 'es' ? 'es' : 'en';
+  return {
+    time: new Intl.DateTimeFormat(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).format(date),
+    day: new Intl.DateTimeFormat(locale, {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+    }).format(date),
+  };
+}
+
 /**
- * `HH:mm` clock. It lives in its own component so a tick re-renders only this
- * node, and it wakes once a minute, on the minute boundary.
+ * Time over the date. A tick re-renders only this node, once a minute,
+ * on the minute boundary.
  */
 export function TrayClock() {
-  // State is the minute string, so an early or duplicate tick bails out of rendering.
+  const { language } = useLanguage();
   const [stamp, setStamp] = useState(() => minuteStamp(new Date()));
+  const clock = formatClock(stamp, language);
 
   useEffect(() => {
     let timer: number | undefined;
@@ -28,7 +55,6 @@ export function TrayClock() {
       timer = window.setTimeout(tick, MINUTE - (Date.now() % MINUTE));
     };
 
-    // Background tabs throttle timers, so resync when the tab becomes visible.
     const onVisibility = () => {
       if (document.visibilityState === 'visible') tick();
     };
@@ -45,9 +71,14 @@ export function TrayClock() {
   return (
     <time
       dateTime={stamp}
-      className="select-none px-2 font-mono text-meta tabular-nums text-fg-inverse"
+      className="flex flex-col items-end justify-center leading-none select-none"
     >
-      {stamp.slice(11)}
+      <span className="font-mono text-body font-semibold tabular-nums text-fg-inverse">
+        {clock.time}
+      </span>
+      <span className="mt-0.5 font-mono text-ui tabular-nums text-fg-inverse-muted">
+        {clock.day}
+      </span>
     </time>
   );
 }
