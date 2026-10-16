@@ -40,7 +40,7 @@ No other runtime dependency is required by this specification. Do not add Redux,
 
 The portfolio is a small, personal operating system that runs in the browser. Visitors arrive at a desktop, open folders, and launch documents that describe the owner's work: who they are (About Me), what they have shipped for clients and for themselves (Projects), and what they are tinkering with (Experiments).
 
-The working name of the visual identity is **Warm Workstation**. It borrows the *interaction grammar* of a desktop (icons, a bottom taskbar, a Start menu, windows that stack) and pairs it with the *material* of the current site: deep ink, warm paper type, and a rust accent. The default theme is dark and calm: the desktop and the windows share the same ink, with light type and — in folders — a floating sidebar. A light theme turns those same roles onto paper. Rust, moss and amber stay the palette's own accents. The result should feel like a well-kept personal machine, not a skin of someone else's OS.
+The working name of the visual identity is **Warm Workstation**. It borrows the *interaction grammar* of a desktop (icons, a top menu bar, a bottom taskbar, a Start menu, windows that stack) and pairs it with the *material* of the current site: deep ink, warm paper type, and a rust accent. The default theme is dark and calm: the desktop and the windows share the same ink, with light type and — in folders — a floating sidebar. A light theme turns those same roles onto paper. Rust, moss and amber stay the palette's own accents. The result should feel like a well-kept personal machine, not a skin of someone else's OS.
 
 ### 1.2 Design principles
 
@@ -96,7 +96,7 @@ The ink, paper and rust ramps extend the existing tokens (`--color-ink #1c1915`,
 
 Components consume semantic tokens only. The dark theme is the default (`@theme` in `src/styles/index.css`). The light theme is the same list of roles remapped on `html[data-theme="light"]`. There is no per-window color scope and no `data-surface` attribute: desktop, windows, taskbar and menus all read the active theme.
 
-The choice is stored in `localStorage` under `portfolio-theme` and painted on `<html>` before the bundle runs, so a saved light theme does not flash dark. The Start menu's Appearance group holds a `menuitemcheckbox` labelled "Light theme".
+The choice is stored in `localStorage` under `portfolio-theme` and painted on `<html>` before the bundle runs, so a saved light theme does not flash dark. The menu bar's right side holds a two-segment switch (sun for light, moon for dark). Language is the menu beside that switch. The Start menu no longer carries appearance or language.
 
 | Semantic token | Dark (default) | Light | Use |
 | --- | --- | --- | --- |
@@ -157,11 +157,10 @@ The pairs below are the **light** theme. In the dark theme, `fg` (`paper-50`) on
 
 | Family token | Stack | Use |
 | --- | --- | --- |
-| `--font-sans` | `'Source Sans 3', ui-sans-serif, system-ui, sans-serif` | All UI and body text |
+| `--font-sans` | `-apple-system, BlinkMacSystemFont, Inter, ui-sans-serif, system-ui, sans-serif` | All UI, body text, and headings |
 | `--font-mono` | `'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace` | Paths, file names, the clock, item counts, technology chips |
-| `--font-display` | `Fraunces, ui-serif, Georgia, serif` | The About Me profile hero and project titles only |
 
-The Google Fonts link in `index.html` adds `family=JetBrains+Mono:wght@400;500` to the existing Fraunces and Source Sans 3 request. `--font-serif` stays as an alias of `--font-display` until the retired pages are removed.
+The Google Fonts link in `index.html` loads Inter (weights 400, 500, 600, plus italic 400) and JetBrains Mono. On Apple platforms `-apple-system` resolves to San Francisco; Inter is the open stand-in everywhere else. Headings use the same sans as the body, at `font-semibold`.
 
 Type scale (semantic `--text-*` tokens with paired `--text-*--line-height`):
 
@@ -172,8 +171,8 @@ Type scale (semantic `--text-*` tokens with paired `--text-*--line-height`):
 | `text-ui` | 14px (0.875rem) | 20px | 600 for titles, 500 for controls | Window titles, buttons, toolbar |
 | `text-body` | 15px (0.9375rem) | 24px | 400 | Window document body |
 | `text-heading` | 18px (1.125rem) | 26px | 600 | Section headings inside documents |
-| `text-title` | 24px (1.5rem) | 30px | 600 (sans) or 520 (display) | Document title |
-| `text-display` | 32px (2rem) | 38px | 520, display | About Me hero name |
+| `text-title` | 24px (1.5rem) | 30px | 600 | Document title |
+| `text-display` | 32px (2rem) | 38px | 600 | About Me hero name |
 
 Rules:
 
@@ -259,7 +258,7 @@ At the bottom-right of the desktop, above the taskbar, a single monospaced line 
 | Toolbar | Document windows may keep action buttons (`ButtonLink`). Folder windows do not repeat the title under the lights. |
 | Body | `flex-1 min-h-0 overflow-y-auto overscroll-contain`. Padding per §2.5. |
 | Status bar | Folder windows only: one quiet line, path in mono on the left and the item count on the right (`text-meta text-fg-muted`). |
-| Resize handle | Bottom-right 16×16 hit area, `cursor-nwse-resize`, three diagonal 1px lines in `indicator-muted`. Only in desktop layout on resizable presets. |
+| Resize handle | Eight hits inside the chrome (§7.7). Edges and corners are 8px; the bottom-right grip stays 16×16, `cursor-nwse-resize`, three diagonal 1px lines in `indicator-muted`. Only in desktop layout on resizable presets. |
 
 ### 2.10 Icons
 
@@ -289,7 +288,7 @@ If a project has a `cover` image, folder windows may show it as a 40×48 cropped
   2. Pinned links: GitHub, LinkedIn, Instagram (40×40 icon buttons). Hidden below `md`, where they're only in the Start menu.
   3. A 1px `border-edge-dark` divider.
   4. The window list: `TaskbarWindowItem`s, in opening order. Order does not change on focus.
-  5. The tray on the right: the clock in `font-mono text-meta tabular-nums`, in `HH:mm` format, updated on the minute boundary.
+  5. The tray on the right: the clock in `font-mono text-body font-semibold tabular-nums`, 24-hour `HH:mm`, with the short date underneath in `text-meta text-fg-inverse-muted`. Both update on the minute boundary and follow the active language.
 
 **Taskbar item visual states** (40px tall, `rounded-control`, `px-2 gap-2`, 16px icon, `text-label` title, `max-w-48` with `truncate`, `min-w-10`):
 
@@ -319,6 +318,13 @@ Each interactive element implements the states below. Visual differences always 
 
 Disabled controls are rare by design. Missing project links are omitted, not shown disabled.
 
+### 2.13 Menu bar
+
+- Fixed to the top, full width, 40px (`--os-menubar-h`) plus `pt-[env(safe-area-inset-top)]`. `bg-taskbar backdrop-blur-md border-b border-edge-dark`, `z-1000`. Same glass as the taskbar. The extra height is vertical padding around the controls.
+- Left: the focused window's title in `text-label font-semibold`. With no focused window, that title is `site.name`. It is a label, not a menu.
+- Right, in one cluster: the language button (`EN` or `ES`, with an inline SVG flag, never an emoji), which opens a menu of `menuitemradio`s aligned to the button's right edge, then the theme switch. The switch is a `radiogroup`: a sun segment and a moon segment on `bg-segment-track`. The selected segment uses `bg-segment text-segment-fg shadow-segment`.
+- The desktop icon grid pads its top by the menu bar. The window layer starts at `top: calc(var(--os-menubar-h) + env(safe-area-inset-top))`. `viewportFromWindow` subtracts `MENUBAR_H` (40) and the taskbar (48, or 56 below `md`). Safe-area insets stay in CSS.
+
 ---
 
 ## 3. Component hierarchy and responsibilities
@@ -328,17 +334,23 @@ Disabled controls are rare by design. Missing project links are omitted, not sho
 ```mermaid
 flowchart TD
   RouterProvider --> DesktopEnvironment
-  DesktopEnvironment --> WindowProvider
+  DesktopEnvironment --> LayoutProvider
+  LayoutProvider --> WindowProvider
   WindowProvider --> RouteWindowSync
   WindowProvider --> DesktopBackground
   WindowProvider --> Desktop
-  WindowProvider --> WindowManager
-  WindowProvider --> Taskbar
+  WindowProvider --> WindowManagerBehavior
+  WindowProvider --> TaskbarBehavior
   WindowProvider --> LiveAnnouncer
   Desktop --> DesktopGrid
-  DesktopGrid --> FolderShortcut
+  DesktopGrid --> IconGridBehavior
+  IconGridBehavior --> IconGrid
+  IconGrid --> FolderShortcut
+  IconGrid --> FileShortcut
   FolderShortcut --> IconTile
-  WindowManager --> Window
+  WindowManagerBehavior --> WindowManager
+  WindowManager --> WindowBehavior
+  WindowBehavior --> Window
   Window --> WindowTitleBar
   WindowTitleBar --> WindowControls
   Window --> WindowBody
@@ -348,45 +360,61 @@ flowchart TD
   OpenedDocument --> FileComponent
   OpenedDocument --> NotFoundDocument
   FolderComponent --> FolderIconGrid
-  FolderIconGrid --> FileShortcut
+  FolderIconGrid --> IconGridBehavior
+  TaskbarBehavior --> Taskbar
   Taskbar --> StartButton
-  Taskbar --> StartMenu
+  Taskbar --> StartMenuBehavior
+  StartMenuBehavior --> StartMenu
   Taskbar --> PinnedLinks
   Taskbar --> TaskbarWindowList
   TaskbarWindowList --> TaskbarWindowItem
-  Taskbar --> WindowSwitcher
+  Taskbar --> WindowSwitcherBehavior
+  WindowSwitcherBehavior --> WindowSwitcher
   Taskbar --> TrayClock
 ```
 
 ### 3.2 Responsibilities
 
-`IconTile` is the shared tile (structure, states, keyboard). `DesktopGrid` and `FolderIconGrid` are the two public grids; both are `IconGrid` with `variant="desktop"` or `variant="window"`. `FolderShortcut` and `FileShortcut` are the tiles the author writes; `FolderIcon` and `FileIcon` stay the SVG drawings. `WindowContent` is named `WindowBody`. `WindowContext` is split into a state context and a dispatch context. The author composes the desktop, each folder, and each file by children. A catalog built when those modules load is only an index of `id` and `path`, not the tree.
+`IconTile` is the shared tile (structure, states, keyboard). `DesktopGrid` and `FolderIconGrid` are the two public grids; both still export from `IconGrid.tsx` and render `IconGridBehavior`. `FolderShortcut` and `FileShortcut` are the tiles the author writes; `FolderIcon` and `FileIcon` stay the SVG drawings. `WindowContent` is named `WindowBody`. `WindowStateContext`, `WindowDispatchContext`, `ThemeContext`, and `IconGridContext` stay. There is no `WindowManagerContext`. The author composes the desktop, each folder, and each file by children. A catalog built when those modules load is only an index of `id` and `path`, not the tree.
+
+A shell paints. The Behavior beside it owns that subtree's state and effects. `Taskbar`, `Window`, `StartMenu`, `WindowSwitcher`, `WindowManager`, and `IconGrid` have no `useState` and no `useEffect`. `StartButton`, `TaskbarWindowItem`, and `WindowControls` have no Behavior. `LayoutProvider` wraps `WindowProvider` from the outside and is the only layout context (`layoutMode` and `viewport`, one `matchMedia` subscription). `viewportFromWindow(layoutMode)` is the only viewport formula: desktop and tablet subtract 48 plus the 40px menu bar, mobile subtracts 56 plus the 40px menu bar, and safe-area insets stay in the bar CSS. A context exists only when several shells read the value. `panel` is `TaskbarBehavior` state. `liveBounds` is `WindowBehavior` state. `instance.bounds` stays the canonical desktop non-maximized rect. `WindowErrorBoundary` stays a class.
 
 | Category | Component / module | Responsibility | Must not |
 | --- | --- | --- | --- |
-| **Structural** | `DesktopEnvironment` | The single route component. Owns the full-viewport shell (`h-dvh overflow-hidden`), mounts `WindowProvider`, renders the page `<h1>` (visually hidden) and skip links. | Hold window state itself. |
+| **Structural** | `DesktopEnvironment` | The single route component. Owns the full-viewport shell (`h-dvh overflow-hidden`), mounts `LayoutProvider` outside `WindowProvider`, and renders `TaskbarBehavior` and `WindowManagerBehavior`. Renders the page `<h1>` (visually hidden) and skip links. | Hold window state itself. Render the `Taskbar` or `WindowManager` shells. |
+| Structural | `LayoutProvider` | The only layout context: `layoutMode`, `viewport`, and the stable readers `readLayoutMode` and `readViewport` (a ref assigned during the provider render, so dispatch reads the same viewport). One `matchMedia` subscription for the layout queries (§8.1). That effect writes mode and viewport. `viewportFromWindow(layoutMode)` in `geometry.ts` is the only viewport formula: desktop and tablet subtract 48 (`TASKBAR_H`) plus 40 (`MENUBAR_H`), mobile subtracts 56 plus 40. Safe-area insets stay in the bar CSS. | Listen to `resize`. Own a second `matchMedia`. Hold window state. |
 | Structural | `DesktopBackground` | Wallpaper layer; handles `pointerdown` on empty desktop (clears selection, dispatches `BLUR`). | Render icons. |
 | Structural | `Desktop` | The desktop the author writes: a `DesktopGrid` whose children are `FolderShortcut`s (`folder={AboutMeFolder}` and the other two). | Dispatch window actions. The shortcut calls `openContent`. |
-| Structural | `WindowManager` | Maps `state.windows` (in stable `openedAt` order) to `Window`s, passing derived `isActive`, `zIndex` and `layoutMode`. Listens to viewport resize and dispatches `VIEWPORT_CHANGED`. Wraps windows in `AnimatePresence`. | Reorder DOM nodes when focus changes. |
-| Structural | `Window` | The only frame. Geometry (inline `transform`, `width`, `height`, `zIndex`), focus-on-pointerdown, minimize/restore animation phases, `hidden`/`inert`, drag and resize wiring, last-focused-element memory. `memo`-ized. Composes `WindowTitleBar` and `WindowBody`. | Be returned by a folder or a document. |
+| Structural | `WindowManagerBehavior` | Three separate single-effect hooks. `useViewportSync` listens to `resize`, writes the context viewport with `viewportFromWindow(readLayoutMode())`, and dispatches `VIEWPORT_CHANGED` only in desktop layout. It does not subscribe to `matchMedia` and does not dispatch on the first mount. `useClosedWindowAnnounce` only announces closed windows. `useCloseFocus` runs the close-focus choreography. | Fold announce, focus, and viewport into one effect. |
+| Structural | `WindowManager` | Shell. Maps windows to `WindowBehavior` inside `AnimatePresence`. No `useState`, no `useEffect`. | Reorder DOM nodes when focus changes. Listen for resize, announce closes, or move focus on close. |
+| Structural | `WindowBehavior` | State and effects for one window. Calls `useWindowDrag` and `useWindowResize`. `liveBounds` is its state. It calls `displayBounds` and is the only writer of the frame `style` (`transform`, `width`, `height`, `zIndex`) the shell receives (`liveBounds ?? displayBounds(instance, layoutMode, viewport)`). `pointerup` commits one `MOVE` or `RESIZE` and clears `liveBounds`. `Escape` clears `liveBounds` without an action, so the shell paints `displayBounds` again (the `pointerdown` rect). `pointercancel` commits. Clamps stay `clampPosition` and `clampBounds`. No Motion drag. Calls `resolvePhase` during render. It is the `memo` boundary, with props `instance`, `isActive`, `zIndex`, and `layoutMode`. | Store `liveBounds` in the reducer. Write `el.style` from the shell. |
+| Structural | `Window` | The only frame. Applies the `style` it receives. Composes `WindowTitleBar` and `WindowBody`. No `useState`, no `useEffect`. | Be returned by a folder or a document. Call `displayBounds`. |
 | Structural | `WindowTitleBar` | Traffic lights, drag start, double-click to maximize. The `<h2>` paints `children`. The `title` string stays for the tooltip, control names, `aria-labelledby`, announce, and the taskbar. | Contain content actions. |
-| Structural | `WindowBody` | Scroll container, `Suspense` fallback (skeleton), error boundary. Memoized on document `id`, `instance.id`, and `isActive` (and `requestedPath` for the not-found dialog) so a drag does not re-render the document. The document element is `OpenedDocument`, itself memoized without `isActive`, so focus does not redraw it. | Look up content by a `kind` switch. |
-| Structural | `WindowResizeHandle` | Bottom-right pointer resize in desktop layout. | Exist below `lg`. |
-| Structural | `Taskbar` | Layout of the Start button, pinned links, window list and tray. | Keep its own list of windows. |
-| **Presentational** | `DesktopGrid`, `FolderIconGrid` | Public faces of `IconGrid`. Roving-tabindex listbox, local selection, 2D arrow navigation, hint "Press Enter to open.", `clearSelection` handle. Children are shortcuts. They do not receive `items`. | Dispatch window actions. Links are not children; they stay on the taskbar. |
+| Structural | `WindowBody` | Scroll container, `Suspense` fallback (skeleton), `WindowErrorBoundary` (stays a class). Memoized on document `id`, `instance.id`, and `isActive` (and `requestedPath` for the not-found dialog) so a drag does not re-render the document. The document element is `OpenedDocument`, itself memoized without `isActive`, so focus does not redraw it. | Look up content by a `kind` switch. |
+| Structural | `WindowResizeHandle` | One edge or corner hit (`n`, `e`, `s`, `w`, `ne`, `nw`, `se`, `sw`) in desktop layout. The opposite side or corner stays anchored. Only `se` draws the grip. | Exist below `lg`. Cover `WindowControls`. |
+| Structural | `TaskbarBehavior` | Owns `panel`, the Start button and switcher refs, and the node focus returns to. Applies `panelAfterLayoutChange` in a layout effect when `layoutMode` changes, and returns focus when the panel closes. Renders the `Taskbar` shell. | Store `panel` on `WindowProvider`. |
+| Structural | `Taskbar` | Shell. Layout of the Start button, pinned links, window list and tray. Receives data and callbacks. No `useState`, no `useEffect`. | Keep its own list of windows. Own `panel`. |
+| **Presentational** | `DesktopGrid`, `FolderIconGrid` | Public exports of `IconGrid.tsx` (`variant="desktop"` or `variant="window"`). Each renders `IconGridBehavior`. Children are shortcuts. They do not receive `items`. | Dispatch window actions. Own selection or roving. Links are not children; they stay on the taskbar. |
+| Presentational | `IconGridBehavior` | Owns `selectedId`, roving (`useRovingGrid`), and the `clearSelection` handle. Builds the `IconGridContext` value shortcuts read. Renders the `IconGrid` shell. | Dispatch window actions. |
+| Presentational | `IconGrid` | Shell. Roving-tabindex listbox, 2D arrow navigation, hint "Press Enter to open.", and the `IconGridContext` provider. No `useState`, no `useEffect`. | Own selection or roving. |
 | Presentational | `FolderShortcut`, `FileShortcut` | One tile. `folder={AboutMeFolder}` or `file={ProfileFile}`. Draws `FolderIcon` (`accent`) or `FileIcon` (`kind`) from the component it already holds, then calls `openContent`. | Accept a string name (`fileToRender`, `folderToRender`) or rename the SVG components. |
 | Presentational | `IconTile` | Icon plus label plus optional file-name line; `desktop` and `window` variants. | Manage selection itself. |
-| Presentational | `WindowControls` | Three buttons with accessible names; calls handlers it receives. | Decide what minimize means. |
-| Presentational | `StartButton`, `StartMenu` | Menu button and menu with full keyboard pattern. Places are the folder components. Elsewhere links use `href`s from `site.ts`. | Call `getContent`. |
-| Presentational | `TaskbarWindowItem` | One button per window instance. Click: restore/focus, or minimize if already active. Middle click (`auxclick`, button 1) closes. Registers its DOM rect for the minimize animation target. | Derive state on its own. |
-| Presentational | `WindowSwitcher` | Sheet listing all windows with restore and close (mobile and overflow). | |
+| Presentational | `WindowControls` | Three buttons with accessible names; calls handlers it receives. No Behavior. | Decide what minimize means. |
+| Presentational | `StartButton` | Menu button. No Behavior. | |
+| Presentational | `StartMenuBehavior` | One effect focuses the requested item. Another listens for `pointerdown` on `document`. Passes the keyboard handler to the shell. | Put state or effects on `StartMenu`. |
+| Presentational | `StartMenu` | Shell. Menu with the full keyboard pattern it receives. Places are the folder components. Elsewhere links use `href`s from `site.ts`. No `useState`, no `useEffect`. | Call `getContent`. |
+| Presentational | `TaskbarWindowItem` | One button per window instance. Click: restore/focus, or minimize if already active. Middle click (`auxclick`, button 1) closes. Registers its DOM rect for the minimize animation target. No Behavior. | Derive state on its own. |
+| Presentational | `WindowSwitcherBehavior` | One effect focuses the sheet. Another listens for an outside pointer. Escape, blur, and focus when a row closes are callbacks passed to the shell. | Put state or effects on `WindowSwitcher`. |
+| Presentational | `WindowSwitcher` | Shell. Sheet listing all windows with restore and close (mobile and overflow). No `useState`, no `useEffect`. | |
 | Presentational | `TrayClock`, `PinnedLinks` | Small leaf components. | |
 | Presentational | Folder components (`AboutMeFolder`, `ProjectsFolder`, `ExperimentsFolder`) | The window body, not a `Window`. One parent: sidebar plus `FolderIconGrid`. Files are written as `FileShortcut` children. Sidebar rows are the same folder components the desktop lists, and they open with `originId`. Empty grid shows the folder's `emptyText`. | Call `getChildren`. Return `<Window>`. |
 | Presentational | File components (`ProfileFile`, project files, experiment files) | The document only: the markup that used to live in the profile, project, and experiment windows. | Return `<Window>`. |
 | Presentational | `NotFoundDocument` | "File not found" dialog for a path no component registered. "Open Projects" calls `openContent(ProjectsFolder)`. | Be a catalog row. |
 | Presentational | `ProjectCard` (existing, restyled) | Used inside `ProfileFile`'s "Selected work" strip; activating a card calls `openContent` on that project component. | Link with `<Link>` directly. |
-| **State** | `windowReducer.ts` | Pure transitions (§4.4). | Touch the DOM, router or `Date.now()` (sequence numbers come from state). |
-| State | `WindowProvider.tsx` | `useReducer`, exposes `WindowStateContext` and `WindowDispatchContext`. | |
+| **State** | `windowReducer.ts` | Pure transitions (§4.4). `instance.bounds` stays the canonical desktop non-maximized rect. | Touch the DOM, router or `Date.now()` (sequence numbers come from state). Store `panel` or `liveBounds`. |
+| State | `windowPhase.ts` | Pure phase helpers, no React: `resolvePhase`, `phaseOnMinimizedChange`, `phaseOnConcealed`. `WindowBehavior` calls `resolvePhase` during render and does not `setState` from it. | Import React. |
+| State | `panelState.ts` | Pure panel helpers, no React: `toggleStart`, `openStartFromKey`, `closeStart`, `toggleSwitcher`, `closeSwitcher`, `panelAfterLayoutChange`. The last returns `null` when the panel is `switcher` and the mode is no longer mobile, so the switcher does not reopen on the next narrow layout. | Import React. |
+| State | `WindowProvider.tsx` | `useReducer`, exposes `WindowStateContext` and `WindowDispatchContext`. `readViewport` returns the layout context's viewport. | Hold `panel` or `liveBounds`. Compute the viewport itself. |
 | State | `useWindowActions.ts` | Action creators that dispatch **and** perform the matching navigation (§5.3). This is the only place UI calls into the window manager. | |
 | State | `selectors.ts` | `selectActiveId`, `selectTaskbarItems`, `selectZIndex`, `selectNextActive`, `selectByContentId`. | |
 | State | `taskbarAnchors.ts` | A ref-based `Map<WindowId, HTMLElement>` in its own context, for minimize/restore animation targets. Not React state. | Trigger renders. |
@@ -405,17 +433,20 @@ src/
   os/
     DesktopEnvironment.tsx
     desktop/DesktopBackground.tsx
-    grid/IconGrid.tsx                 DesktopGrid, FolderIconGrid
+    grid/IconGrid.tsx                 DesktopGrid, FolderIconGrid (shell)
+    grid/IconGridBehavior.tsx         selection, roving, clearSelection
     grid/FolderShortcut.tsx  FileShortcut.tsx
     grid/GridComponents/IconTile.tsx
-    taskbar/Taskbar.tsx
-    taskbar/TaskbarComponents/StartButton.tsx  StartMenu.tsx  PinnedLinks.tsx
-    taskbar/TaskbarComponents/TaskbarWindowItem.tsx  WindowSwitcher.tsx  TrayClock.tsx
+    taskbar/Taskbar.tsx  TaskbarBehavior.tsx
+    taskbar/panelState.ts             pure panel transitions
+    taskbar/TaskbarComponents/StartButton.tsx  StartMenu.tsx  StartMenuBehavior.tsx  PinnedLinks.tsx
+    taskbar/TaskbarComponents/TaskbarWindowItem.tsx  WindowSwitcher.tsx  WindowSwitcherBehavior.tsx  TrayClock.tsx
     taskbar/TaskbarHelpers/taskbarAnchors.ts
-    windows/Window.tsx
-    windows/WindowsComponents/WindowManager.tsx  WindowTitleBar.tsx  WindowControls.tsx
+    windows/Window.tsx  WindowBehavior.tsx
+    windows/windowPhase.ts            pure phase transitions
+    windows/WindowsComponents/WindowManager.tsx  WindowManagerBehavior.tsx  WindowTitleBar.tsx  WindowControls.tsx
     windows/WindowsComponents/WindowBody.tsx  NotFoundDocument.tsx  WindowResizeHandle.tsx  WindowErrorBoundary.tsx
-    windows/WindowsHelpers/geometry.ts  presets.ts  useWindowDrag.ts  useWindowResize.ts  useLayoutMode.ts
+    windows/WindowsHelpers/geometry.ts  presets.ts  useWindowDrag.ts  useWindowResize.ts  useLayoutMode.ts  LayoutProvider.tsx
     state/WindowProvider.tsx
     state/StateHelpers/types.ts  windowReducer.ts  selectors.ts  useWindowActions.ts
     routing/RouteWindowSync.tsx
@@ -814,6 +845,7 @@ Every preset is further capped by the desktop area: `width ≤ area.width − 2�
 
 ```ts
 export const TASKBAR_H = 48;        // 56 below md
+export const MENUBAR_H = 40;
 export const TITLEBAR_H = 40;
 export const GUTTER = 16;
 export const CASCADE_STEP = 28;
@@ -847,15 +879,34 @@ The title bar can never go above the top edge or under the taskbar, and at least
 ### 7.6 Dragging (desktop layout only)
 
 - Starts on `pointerdown` on the title bar with the primary button, unless the target is inside `WindowControls` (`closest('button')`). The window is focused immediately (§9.5).
-- After 3px of movement the drag begins: `setPointerCapture`, `document.body` gets `select-none`, and the window frame's `style.transform` is written directly through a ref inside `requestAnimationFrame`, with live clamping. **No React state updates per frame.**
-- `pointerup` commits one `MOVE`. `pointercancel` commits the last valid position. `Escape` during drag reverts to the start position.
+- After 3px of movement the drag begins: `setPointerCapture`, and `document.body` gets `select-none`. Each frame updates `liveBounds` in `WindowBehavior`. The Behavior is the only writer: the shell receives `style` (`transform`, `width`, `height`, `zIndex`). Clamps stay `clampPosition` and `clampBounds`. There is no Motion drag.
+- `pointerup` commits one `MOVE` and clears `liveBounds`. `pointercancel` commits. `Escape` restores the `pointerdown` bounds by clearing `liveBounds`; `displayBounds` is unchanged.
 - Maximized windows can't be dragged; double-clicking the title bar toggles maximize instead.
 - The title bar sets `touch-action: none` only in desktop layout.
 - No inertia, no snapping, no docking to edges in v1.
 
 ### 7.7 Resizing (desktop layout only)
 
-Only the bottom-right `WindowResizeHandle`, on resizable presets. It uses the same pointer capture, rAF and commit pattern as drag. It clamps to preset min and max and to the area (the window may not grow under the taskbar). No edge or top-left resizing in v1. Resizing has a keyboard-free alternative: the Maximize button. No function in the product requires dragging, which satisfies WCAG 2.5.7.
+Eight hits, on resizable presets, and only when `canResize` is true (desktop layout, not maximized). They are siblings of `WindowTitleBar`, inside the chrome's `overflow-hidden`, so the rounded frame clips them. Each hit is 8px (`z-10`, `touch-none`, `aria-hidden`). The desktop title bar is 40px and the traffic lights are 20px, centered, so they start about 10px in from the corner; an 8px corner leaves Close, minimize, and zoom clickable. The bottom-right grip stays the visible 16px mark and carries `data-resize-edge="se"`. The other seven hits draw nothing. Cursors: `n`/`s` `ns-resize`, `e`/`w` `ew-resize`, `nw`/`se` `nwse-resize`, `ne`/`sw` `nesw-resize`.
+
+`data-resize-edge` is read from the hit's `currentTarget`. A missing value does not start a gesture. The anchor is the side or corner the pointer does not touch. It keeps the same screen coordinates during the gesture and after `RESIZE`. An edge does not move the perpendicular axis. A corner moves both axes and fixes the opposite corner.
+
+| Hit | Anchor that stays | Free axis |
+| --- | --- | --- |
+| `e` | Left edge (`origin.x`); `y` and height stay | width |
+| `w` | Right edge (`origin.x + origin.width`); `y` and height stay | width, then `x = right − width` |
+| `s` | Top edge (`origin.y`); `x` and width stay | height |
+| `n` | Bottom edge (`origin.y + origin.height`); `x` and width stay | height, then `y = bottom − height` |
+| `se` | Top-left `(origin.x, origin.y)` | width and height |
+| `sw` | Top-right `(right, origin.y)` | width and height; `x = right − width` |
+| `ne` | Bottom-left `(origin.x, bottom)` | width and height; `y = bottom − height` |
+| `nw` | Bottom-right `(right, bottom)` | width and height; `x = right − width`, `y = bottom − height` |
+
+The gesture matches drag: primary button, `setPointerCapture`, `select-none` on `document.body`, and one `requestAnimationFrame` per frame that writes `liveBounds` in `WindowBehavior`. The shell only paints. `pointerup` and `pointercancel` commit one `RESIZE` when the rect changed. `Escape` clears `liveBounds` and does not commit, so the frame returns to the `pointerdown` rect. There is no Motion drag.
+
+Size uses `fitSize`, the same cap as `clampBounds` (preset min and max, and the area minus `2·GUTTER`). If the requested size would push the free edge past that cap or past the `clampPosition` band (`x` in `[MIN_VISIBLE_X − width, area.width − MIN_VISIBLE_X]`, `y` in `[0, area.height − TITLEBAR_H]`), that axis stops at the limit. The window is not translated to keep the title on screen. The rect passed to `RESIZE` is a fixed point of `clampBounds`: after the reducer clamps it, the anchor is still on the origin coordinates. The reducer does not receive the edge. `MOVE` and `VIEWPORT_CHANGED` keep the previous clamp behavior.
+
+The top hits are not children of the title bar, so a resize `pointerdown` does not start a drag. It still bubbles to the frame, which focuses an inactive window. The rest of the title bar drags (3px threshold; double-click maximizes). Resizing has a keyboard-free alternative: the Maximize button. No function in the product requires dragging, which satisfies WCAG 2.5.7.
 
 ### 7.8 Layering
 
@@ -1014,7 +1065,7 @@ Opening or restoring a window must never trap focus. Windows are non-modal and `
 | `easeOut` | `[0.2, 0, 0, 1]` | Things entering or settling |
 | `easeIn` | `[0.4, 0, 1, 1]` | Things leaving |
 
-No springs with overshoot, nothing longer than 240ms, and no animation of layout properties (`width`, `height`, `top`, `left`): only `transform` and `opacity`.
+No springs with overshoot and nothing longer than 240ms. Layout properties (`width`, `height`, `top`, `left`) stay put except the maximize tween, which moves the frame's own box. Everything else animates `transform` and `opacity` only.
 
 ### 10.2 Structure
 
@@ -1028,7 +1079,7 @@ The window frame is a plain `div` that owns geometry: inline `transform: transla
 | Window close | `opacity →0`, `scale →0.97` | fast, easeIn | `AnimatePresence` exit; the reducer removes it immediately, so the taskbar updates at once |
 | Minimize | Translate and scale toward the window's taskbar item: `x/y = itemCenter − windowCenter`, `scale 0.25`, `opacity →0` | slow, easeIn | The reducer flips `minimized` immediately. `Window` keeps a local `phase: 'visible' | 'minimizing' | 'hidden'` and applies `hidden` + `inert` in `onAnimationComplete`. If no anchor is registered (overflow, mobile), it falls back to `y 24`, `opacity 0`. |
 | Restore | The reverse of minimize | slow, easeOut | Starts from the taskbar item rect. Interruptible: restoring during minimize reverses from the current values. |
-| Maximize / restore size | No tween; geometry jumps | — | Avoids animating width and height. A 120ms opacity dip on the body hides content reflow. |
+| Maximize / restore size | The frame's `transform`, `width`, and `height` move from the previous rect to the next. Border radius follows. The body stays visible. | base, easeOut | Reduced motion jumps. |
 | Focus switch | CSS `transition-[box-shadow,background-color,color]` on frame and title bar | fast, `ease-os-out` | No movement |
 | Start menu open | `opacity 0→1`, `y 8→0` (mobile sheet: `y 24→0`) | base, easeOut | |
 | Start menu close | `opacity →0`, `y →4` | fast, easeIn | |
@@ -1057,9 +1108,8 @@ The window frame is a plain `div` that owns geometry: inline `transform: transla
 
 @theme {
   /* fonts */
-  --font-sans: 'Source Sans 3', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, Inter, ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-display: Fraunces, ui-serif, Georgia, serif;
 
   /* raw palette */
   --color-ink-950: #14110e;
@@ -1213,12 +1263,13 @@ const tile = {
 | ADR-13 | **No global keyboard shortcuts** | Every viable combination conflicts with browser or OS shortcuts (§9.2). |
 | ADR-14 | **Local brand SVGs** | lucide-react 1.x ships no brand marks. |
 | ADR-15 | **No boot screen, no artificial delays** | Respects visitors' time; principle 5. |
+| ADR-16 | **A shell has no state and no effects.** One Behavior per subtree. A context exists only when several shells read the value. `liveBounds` is not reducer state. `instance.bounds` remains the last non-maximized desktop rect. | The shell paints; the Behavior owns that subtree's transitions. A gesture writes `liveBounds` every frame and commits once, so the reducer is not copied per frame. `displayBounds` still reads `instance.bounds`. |
 
 ### 12.2 Rendering and performance
 
-- `Window` is `memo`-ized with props `instance`, `isActive`, `zIndex` and `layoutMode`. The reducer preserves object identity for untouched instances, so focusing one window re-renders two frames (the old and new active), not every window.
+- `WindowBehavior` is the `memo` boundary, with props `instance`, `isActive`, `zIndex` and `layoutMode`. The reducer preserves object identity for untouched instances, so focusing one window re-renders two frames (the old and new active), not every window.
 - `WindowBody` is memoized on the document id, `instance.id`, and `isActive`, and receives no geometry, so a drag commit does not re-render the document. `OpenedDocument` ignores `isActive`, so focus does not redraw it either. The document is not created as a child of `Window` inside `WindowManager`'s map.
-- Drag and resize mutate the DOM through refs inside `requestAnimationFrame` and commit once.
+- Each frame of a drag or resize updates `liveBounds`. `WindowBody` does not re-render, because its memo ignores geometry.
 - Each window body has its own `Suspense` boundary (skeleton: three `bg-sunken` bars) and its own `WindowErrorBoundary` (a small class component). A crashing document breaks only its own window and offers "Close window".
 - The clock re-renders once a minute, in its own component.
 
