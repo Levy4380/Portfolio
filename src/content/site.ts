@@ -1,9 +1,9 @@
 export const site = {
-  name: 'Your Name',
+  name: 'Tomas Levy',
   role: 'Frontend Developer / Web Developer',
-  email: 'hello@example.com',
-  githubUrl: 'https://github.com/your-username',
-  linkedinUrl: 'https://www.linkedin.com/in/your-profile',
+  email: 'contact@tomaslevy.dev',
+  githubUrl: 'https://github.com/Levy4380',
+  linkedinUrl: 'https://www.linkedin.com/in/tomas-levy-9a1368195',
   instagramUrl: 'https://www.instagram.com/your-profile',
   /**
    * Production origin without a trailing slash, for example "https://example.com".

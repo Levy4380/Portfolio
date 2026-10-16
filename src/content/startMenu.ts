@@ -7,6 +7,6 @@ export const startMenu = [
   },
   {
     label: 'Elsewhere',
-    items: ['link:github', 'link:linkedin', 'link:instagram'],
+    items: ['link:github', 'link:linkedin'],
   },
 ] as const satisfies readonly { label: string; items: readonly ContentKey[] }[];
