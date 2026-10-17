@@ -29,7 +29,7 @@ export function Desktop({
         ariaLabel={translation('os.desktop')}
         className="pointer-events-none w-full shrink-0 *:pointer-events-auto lg:min-h-0 lg:min-w-0 lg:flex-1"
       >
-        <FileShortcut file={ProfileFile} />
+        <FileShortcut file={ProfileFile} size={96} />
         <FolderShortcut folder={AboutMeFolder} />
         <FolderShortcut folder={ProjectsFolder} />
         <FolderShortcut folder={ExperimentsFolder} />

@@ -6,7 +6,7 @@ import type { IconGridVariant } from '../../contracts.ts';
 const tile = {
   base: 'group flex h-(--os-icon-tile-h) cursor-pointer flex-col items-center gap-1 rounded-tile p-2 text-center select-none touch-manipulation focus-ring transition-colors duration-120 active:scale-97 motion-reduce:transform-none aria-selected:ring-1 [&>svg]:block',
   desktop:
-    'w-full max-w-24 md:w-24 hover:bg-glass-hover active:bg-glass-active aria-selected:ring-accent-on-dark/60',
+    'w-full max-w-24 md:w-24 hover:bg-desktop-hover hover:ring-1 hover:ring-paper-50/70 active:bg-desktop-press aria-selected:ring-accent-on-dark/60',
   window:
     'w-24 text-fg hover:bg-chrome-hover active:bg-chrome-press aria-selected:bg-selection aria-selected:ring-accent/40 window-inactive:aria-selected:ring-indicator-muted',
 } as const;

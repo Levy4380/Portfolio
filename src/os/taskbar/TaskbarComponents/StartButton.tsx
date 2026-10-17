@@ -17,8 +17,8 @@ export interface StartButtonProps {
 }
 
 /**
- * Apps launcher. A 3×3 grid stands in for the start menu. The control is a
- * square: 40px from `md`, 44px below. The fill is the taskbar hover plate.
+ * Apps launcher. A 3×3 grid sits beside the Start label. 40px tall from `md`,
+ * 44px below. The fill is the taskbar hover plate.
  */
 export function StartButton({ ref, open, onToggle, onOpenFrom, controlsId }: StartButtonProps) {
   const { language } = useLanguage();
@@ -41,7 +41,7 @@ export function StartButton({ ref, open, onToggle, onOpenFrom, controlsId }: Sta
       onClick={onToggle}
       onKeyDown={handleKeyDown}
       className={cn(
-        'grid size-10 max-md:size-11 shrink-0 place-items-center rounded-control select-none touch-manipulation cursor-pointer',
+        'flex h-10 max-md:h-11 shrink-0 items-center gap-2 rounded-control px-3 select-none touch-manipulation cursor-pointer',
         'bg-glass-hover hover:bg-glass-active active:bg-glass-active aria-expanded:bg-glass-active',
         'text-fg-inverse',
         'transition-[transform,background-color] duration-base ease-os-out',
@@ -49,8 +49,8 @@ export function StartButton({ ref, open, onToggle, onOpenFrom, controlsId }: Sta
         'active:scale-97 motion-reduce:active:scale-100 motion-reduce:transition-none',
       )}
     >
-      <LayoutGrid aria-hidden className="size-7" strokeWidth={1} />
-      <span className="sr-only">{translation('os.start')}</span>
+      <LayoutGrid aria-hidden className="size-5 shrink-0" strokeWidth={1.75} />
+      <span className="text-label font-medium">{translation('os.start')}</span>
     </button>
   );
 }

@@ -13,5 +13,5 @@ export function ShellGlyph({
   if (icon.glyph === 'folder') {
     return <FolderIcon accent={icon.accent} className={className} />;
   }
-  return <FileIcon kind={icon.kind} className={className} />;
+  return <FileIcon kind={icon.kind} badge={icon.badge} className={className} />;
 }

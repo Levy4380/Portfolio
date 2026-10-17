@@ -11,7 +11,7 @@ export const SkillsFile = defineOpenable(
     title: 'aboutme.skills.title',
     preset: 'profile',
     fileName: 'skills.json',
-    icon: { glyph: 'file', kind: 'profile' },
+    icon: { glyph: 'file', kind: 'profile', badge: 'code' },
   },
   function SkillsFile() {
     const { language } = useLanguage();

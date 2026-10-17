@@ -64,6 +64,9 @@
   --color-chrome-press: rgb(251 248 242 / 0.16);
   --color-glass-hover: rgb(251 248 242 / 0.1);
   --color-glass-active: rgb(251 248 242 / 0.16);
+  /* Wallpaper stays dark in both themes, so the desktop plate does not flip. */
+  --color-desktop-hover: rgb(251 248 242 / 0.28);
+  --color-desktop-press: rgb(251 248 242 / 0.4);
   --color-segment-track: rgb(0 0 0 / 0.35);
   --color-segment: var(--color-ink-500);
   --color-segment-fg: var(--color-paper-50);
@@ -136,7 +139,7 @@
   --os-menubar-h: 40px;
   --os-titlebar-h: 40px;
   /* Icon + two label lines + tile padding. Desktop rows use the same length. */
-  --os-icon-tile-h: 9.5rem;
+  --os-icon-tile-h: 8.7rem;
   --color-scrollbar: color-mix(in srgb, var(--color-fg-muted) 55%, transparent);
   color-scheme: dark;
 }
@@ -188,6 +191,43 @@ html[data-theme='light'] {
 }
 
 @custom-variant window-inactive (&:where([data-window]:not([data-active]) *));
+
+/*
+ * File sheet. Light theme strokes the page in ink so it survives paper
+ * windows and the light taskbar. The desktop grid keeps the paper fill
+ * because it sits on the dark wallpaper.
+ */
+.file-sheet {
+  fill: var(--color-paper-50);
+  stroke: rgb(28 25 21 / 0.22);
+  stroke-width: 1.25;
+  stroke-linejoin: round;
+}
+
+.file-lines {
+  stroke: var(--color-ink-400);
+  stroke-width: 1.75;
+}
+
+.file-mark {
+  color: var(--color-ink-800);
+}
+
+html[data-theme='light'] .file-sheet {
+  fill: none;
+  stroke: var(--color-ink-700);
+  stroke-width: 1.75;
+}
+
+html[data-theme='light'] .file-lines {
+  stroke: var(--color-ink-600);
+}
+
+html[data-theme='light'] [data-variant='desktop'] .file-sheet {
+  fill: var(--color-paper-50);
+  stroke: rgb(28 25 21 / 0.28);
+  stroke-width: 1.25;
+}
 
 @utility focus-ring {
   &:focus-visible {

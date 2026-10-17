@@ -1,6 +1,6 @@
 import { createElement, type ReactNode } from 'react';
 
-import type { FileKind } from '../icons/FileIcon.tsx';
+import type { FileBadge, FileKind } from '../icons/FileIcon.tsx';
 import type { FolderAccent } from '../icons/FolderIcon.tsx';
 import type { TranslationKey } from './i18n/useTranslation.ts';
 import type {
@@ -13,7 +13,7 @@ export const NOT_FOUND_ID = 'system:not-found' satisfies ContentId;
 
 export type ShellIcon =
   | { glyph: 'folder'; accent: FolderAccent }
-  | { glyph: 'file'; kind: FileKind };
+  | { glyph: 'file'; kind: FileKind; badge?: FileBadge };
 
 export interface OpenableProps {
   windowId: WindowId;

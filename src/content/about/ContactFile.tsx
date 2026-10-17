@@ -21,7 +21,7 @@ export const ContactFile = defineOpenable(
     title: 'aboutme.contact.title',
     preset: 'profile',
     fileName: 'contact.vcf',
-    icon: { glyph: 'file', kind: 'profile' },
+    icon: { glyph: 'file', kind: 'profile', badge: 'mail' },
   },
   function ContactFile() {
     const { language } = useLanguage();

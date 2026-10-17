@@ -77,7 +77,7 @@ export function Taskbar({
         aria-label={translation('os.taskbar')}
         className={cn(
           'fixed inset-x-0 bottom-0 z-1000 flex items-center gap-1 px-4 text-fg-inverse',
-          'bg-taskbar shadow-taskbar backdrop-blur-md',
+          'bg-menu-solid shadow-taskbar',
           'h-[calc(3.5rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] md:h-12 md:pb-0',
         )}
       >

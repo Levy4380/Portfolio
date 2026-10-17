@@ -50,7 +50,7 @@ export function MenuBar({
       className={cn(
         'fixed inset-x-0 top-0 z-1000 flex items-center justify-between gap-3 px-4 text-fg-inverse',
         'h-[calc(var(--os-menubar-h)+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]',
-        'border-b border-edge-dark bg-taskbar backdrop-blur-md',
+        'border-b border-edge-dark bg-menu-solid',
       )}
     >
       <span

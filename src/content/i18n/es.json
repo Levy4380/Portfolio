@@ -1,7 +1,7 @@
 {
   "os": {
     "places": "Lugares",
-    "elsewhere": "En otro lugar",
+    "networks": "Mis redes",
     "appearance": "Apariencia",
     "language": "Idioma",
     "english": "English",
@@ -12,7 +12,7 @@
     "desktop": "Escritorio",
     "openWindows": "Ventanas abiertas",
     "openWindowsCount": "Ventanas abiertas, {count}",
-    "pinnedLinks": "Enlaces fijados",
+    "pinnedLinks": "Fijados",
     "folders": "Carpetas",
     "lightTheme": "Tema claro",
     "darkTheme": "Tema oscuro",

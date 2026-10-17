@@ -1,7 +1,7 @@
 {
   "os": {
     "places": "Places",
-    "elsewhere": "Elsewhere",
+    "networks": "My networks",
     "appearance": "Appearance",
     "language": "Language",
     "english": "English",
@@ -12,7 +12,7 @@
     "desktop": "Desktop",
     "openWindows": "Open windows",
     "openWindowsCount": "Open windows, {count}",
-    "pinnedLinks": "Pinned links",
+    "pinnedLinks": "Pinned",
     "folders": "Folders",
     "lightTheme": "Light theme",
     "darkTheme": "Dark theme",

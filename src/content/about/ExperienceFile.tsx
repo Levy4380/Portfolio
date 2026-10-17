@@ -32,7 +32,7 @@ export const ExperienceFile = defineOpenable(
     title: 'aboutme.experience.title',
     preset: 'profile',
     fileName: 'experience.log',
-    icon: { glyph: 'file', kind: 'profile' },
+    icon: { glyph: 'file', kind: 'profile', badge: 'briefcase' },
   },
   function ExperienceFile() {
     const { language } = useLanguage();

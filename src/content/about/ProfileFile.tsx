@@ -20,7 +20,7 @@ export const ProfileFile = defineOpenable(
     title: 'aboutme.profile.title',
     preset: 'profile',
     fileName: 'readme.md',
-    icon: { glyph: 'file', kind: 'profile' },
+    icon: { glyph: 'file', kind: 'profile', badge: 'user' },
   },
   function ProfileFile({ windowId }) {
     const { openContent } = useWindowActions();
